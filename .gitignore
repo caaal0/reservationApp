@@ -2,4 +2,3 @@
 .vscode/
 ./server/creds.json
 ./server/node_modules/
-./client/*
