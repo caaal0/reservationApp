@@ -1,0 +1,15 @@
+{
+  "name": "seated",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-server": "cd server && npm install",
+    "start-server": "cd server && npm start",
+    "dev-server": "cd server && npm run devStart",
+    "start-client": "cd client/Seated && npm run dev"
+  },
+  "author": "Justin Carl Sagun",
+  "license": "ISC",
+  "description": ""
+}
