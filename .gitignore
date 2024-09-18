@@ -1,4 +1,4 @@
 .env
 .vscode/
-./server/creds.json
-./server/node_modules/
+server/creds.json
+server/node_modules/
