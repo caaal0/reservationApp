@@ -1,5 +1,5 @@
 {
-  "name": "seated",
+  "name": "server",
   "version": "1.0.0",
   "description": "testing",
   "main": "index.js",
@@ -9,7 +9,7 @@
     "start": "node index.js",
     "devStart": "nodemon index.js"
   },
-  "author": "caloy",
+  "author": "Justin Carl Sagun",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",
