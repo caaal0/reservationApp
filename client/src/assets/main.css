@@ -1,0 +1,21 @@
+:root {
+    /* Base colors */
+    --white: #ffffff;
+    --gray: #808080;
+    --black: #000000;
+
+    /* Earthy Greens */
+    --green-light: #a7cba9; /* Light green */
+    --green-medium: #6b8d71; /* Medium green */
+    --green-dark: #3a5335; /* Dark green */
+
+    /* Gentle Reds */
+    --red-light: #ffadad; /* Light, soft red */
+    --red-medium: #e57373; /* Medium, softer red */
+    --red-dark: #c44536; /* Dark, muted red */
+
+    /* Complementary Browns */
+    --brown-light: #c1a785; /* Light brown */
+    --brown-medium: #8b6f47; /* Medium brown */
+    --brown-dark: #533d1e; /* Dark brown */
+}
