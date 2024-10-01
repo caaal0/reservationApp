@@ -1,10 +1,8 @@
 <template>
-  <!-- <HelloWorld /> -->
-   <!-- <AppFooter /> -->
   <v-container>
     <v-row>
       <v-col>
-        <h1>3rd floor</h1>
+        <h1>2nd floor</h1>
       </v-col>
     </v-row>
   </v-container>
