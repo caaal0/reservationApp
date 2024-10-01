@@ -23,7 +23,7 @@ const verifyUserToken = async (req, res, next) => {
 
 //TODO: ready if librarycardnumber will be used
 //TODO: validate if email is unique (middleware)
-const register = async (req, res) => {
+const signup = async (req, res) => {
     
     try {
         const { email, password, name } = req.body;
@@ -64,7 +64,7 @@ const login = async (req, res) => {
 
 export default {
     verifyUserToken,
-    register,
+    signup,
     login
     // Other functions...
 };

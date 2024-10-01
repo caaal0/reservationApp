@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/', index.homePage);
 //User authentication
-router.post('/register', auth.register);
+router.post('/signup', auth.signup);
 // router.post('/login', auth.login);
 
 // Reservation management
