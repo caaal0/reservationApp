@@ -5,39 +5,48 @@ import { useRouter } from 'vue-router'
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const loading = ref(false)
 const router = useRouter()
 
 const required = (value) => !!value || 'This field is required.'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 const minPasswordLength = (value) => value.length >= 6 || 'Password must be at least 6 characters long.'
 
-function signup() {
-  alert(`${name.value}, ${email.value}, ${password.value}`)
-  router.push('/')
+const emit = defineEmits(['close', 'switch-to-login'])
+
+async function signup() {
+  // alert(`${name.value}, ${email.value}, ${password.value}`)
+  loading.value = true;
+  try {
+      const response = await fetch('http://localhost:8080/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Connection': 'keep-alive',
+        },
+        body: JSON.stringify({
+          email: email.value,
+          password: password.value,
+          name: name.value,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Signup successful:', data);
+        loading.value = false;
+        emit('close');
+        // Handle success (e.g., redirect or show a message)
+      } else {
+        console.error('Signup failed');
+        alert('Signup failed');
+        // Handle failure (e.g., show an error message)
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
 }
 
-// function signup(){
-//   fetch('http://localhost:3000/api/auth/signup', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify({
-//       name: name.value,
-//       email: email.value,
-//       password: password.value
-//     })
-//   })
-//   .then(res => res.json())
-//   .then(data => {
-//     if (data.error) {
-//       alert(data.error)
-//     } else {
-//       router.push('/login')
-//     }
-//   })
-//   .catch(err => console.error(err))
-// }
 </script>
 
 <template>
@@ -69,9 +78,10 @@ function signup() {
             :rules="[required]"
           ></v-text-field>
           <v-btn
-            type="submit"
             color="green"
             style="margin-bottom: 20px;"
+            type="button"
+            :loading="loading"
             @click="signup"
           >
             Signup
@@ -109,6 +119,7 @@ h1 {
   right: 10px;
   z-index: 10;
   background-color: var(--red-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 .close-btn:hover {
   background-color: transparent;
