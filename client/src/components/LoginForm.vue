@@ -12,9 +12,6 @@ const router = useRouter()
 const emit = defineEmits(['close', 'switch-to-signup'])
 
 async function login() {
-  // alert(`${email.value}, ${password.value}`)
-  // console.log(email.value, password.value)
-  // $emit('close');
   loading.value = true;
   try {
     console.log(auth)
