@@ -24,7 +24,7 @@ const verifyUserToken = async (req, res, next) => {
 //TODO: ready if librarycardnumber will be used
 //TODO: validate if email is unique (middleware)
 const signup = async (req, res) => {
-    console.log("signup called")
+
     try {
         const { email, password, name } = req.body;
         const userRecord = await admin.auth().createUser({
