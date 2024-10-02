@@ -1,3 +1,53 @@
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../firebase/firebase.js'; // Import Firebase auth from your config
+
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+const router = useRouter()
+
+const emit = defineEmits(['close', 'switch-to-signup'])
+
+async function login() {
+  // alert(`${email.value}, ${password.value}`)
+  // console.log(email.value, password.value)
+  // $emit('close');
+  loading.value = true;
+  try {
+    console.log(auth)
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+    const token = await userCredential.user.getIdToken();
+
+    // Send token to backend
+    const response = await fetch('http://localhost:8080/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Login successful:', data);
+      emit('close');
+    } else {
+      console.error('Login failed');
+      alert('Login failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Login error.');
+  } finally {
+    loading.value = false;
+  }
+  // emit('close')
+}
+</script>
+
 <template>
   <v-container class="fill-height" :style="{background: 'var(--white)'}">
     <v-row justify="center">
@@ -22,6 +72,8 @@
             @click="login"
             color="green"
             style="margin-bottom: 20px;"
+            type="button"
+            :loading="loading"
           >
             Login
           </v-btn>
@@ -44,16 +96,6 @@
   </v-container>
 </template>
 
-<script setup>
-const email = ref('')
-const password = ref('')
-const router = useRouter()
-
-function login() {
-  alert(`${email.value}, ${password.value}`)
-}
-</script>
-
 <style scoped>
 h1 {
   font-size: 2.5rem;
@@ -66,6 +108,7 @@ h1 {
   right: 10px;
   z-index: 10;
   background-color: var(--red-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 .close-btn:hover {
   background-color: transparent;
