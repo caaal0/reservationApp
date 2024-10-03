@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { loginHelper } from '../firebase/authHelper.js'
 
 const name = ref('')
 const email = ref('')
@@ -35,7 +36,9 @@ async function signup() {
         const data = await response.json();
         console.log('Signup successful:', data);
         loading.value = false;
-        emit('close');
+        // emit('signup-success');
+        const msg = loginHelper(email.value, password.value);
+        emit('signup-success');
         // Handle success (e.g., redirect or show a message)
       } else {
         console.error('Signup failed');

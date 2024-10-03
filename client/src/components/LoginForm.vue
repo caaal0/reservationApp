@@ -3,34 +3,23 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebase/firebase.js'; // Import Firebase auth from your config
+import { loginHelper } from '../firebase/authHelper.js';
+import { defineEmits } from 'vue';
 
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const router = useRouter()
 
-const emit = defineEmits(['close', 'switch-to-signup'])
+const emit = defineEmits(['close', 'switch-to-signup', 'login-success'])
 
-async function login() {
+async function login(){
   loading.value = true;
-  try {
-    console.log(auth)
-    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
-    const token = await userCredential.user.getIdToken();
-
-    // Send token to backend
-    const response = await fetch('http://localhost:8080/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Login successful:', data);
-      emit('close');
+  try{
+    const msg = await loginHelper(email.value, password.value);
+    if (msg.success == true) {
+      loading.value = false;
+      emit('login-success');
     } else {
       console.error('Login failed');
       alert('Login failed');
@@ -41,8 +30,39 @@ async function login() {
   } finally {
     loading.value = false;
   }
-  // emit('close')
 }
+
+// async function login() {
+//   loading.value = true;
+//   try {
+//     const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+//     const token = await userCredential.user.getIdToken();
+
+//     // Send token to backend
+//     const response = await fetch('http://localhost:8080/login', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${token}`,
+//       },
+//     });
+
+//     if (response.ok) {
+//       const data = await response.json();
+//       console.log('Login successful:', data);
+//       emit('login-success');
+//     } else {
+//       console.error('Login failed');
+//       alert('Login failed');
+//     }
+//   } catch (error) {
+//     console.error('Error:', error);
+//     alert('Login error.');
+//   } finally {
+//     loading.value = false;
+//   }
+//   // emit('close')
+// }
 </script>
 
 <template>
@@ -66,7 +86,7 @@ async function login() {
             type="password"
           ></v-text-field>
           <v-btn
-            @click="login"
+            @click="login(email.valueOf(), password.valueOf())"
             color="green"
             style="margin-bottom: 20px;"
             type="button"
