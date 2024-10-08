@@ -60,7 +60,7 @@ const login = async (req, res) => {
         const decodedToken = await admin.auth().verifyIdToken(token);
         
         const user = await admin.auth().getUser(decodedToken.uid); // Get the user data
-        console.log(user);
+        // console.log(user);
         res.status(200).send({ success: true, user: user });
       } catch (err) {
         res.status(500).send({ success: false, msg: 'Unable to login', error: err.message });
