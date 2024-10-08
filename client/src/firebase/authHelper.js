@@ -1,11 +1,12 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useAuthStore } from '../stores/auth.js';
 import { auth } from './firebase.js'; // Import Firebase auth from your config
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export async function loginHelper(email, password) {
   try {
-    console.log(email, password);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
+    const authStore = useAuthStore();
 
     // Send token to backend
     const response = await fetch('http://localhost:8080/login', {
@@ -18,8 +19,10 @@ export async function loginHelper(email, password) {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Login successful:', data);
+      // console.log('Login successful:', data);
+      // setPersistence(auth, browserLocalPersistence);
       // emit('login-success');
+      authStore.fetchCurrentUser();
       return{success: true, data};
     } else {
       console.error('Login failed');
