@@ -1,6 +1,6 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -17,5 +17,16 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and export it
 const auth = getAuth(app);
+// setPersistence(auth, browserLocalPersistence);
+// console.log("PERSISTENCE SET LOCAL")
+
+//to set persistance to local
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Session persistence set to browser local storage.");
+  })
+  .catch((error) => {
+    console.error("Error setting session persistence:", error);
+  });
 
 export { auth };
