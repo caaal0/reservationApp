@@ -1,7 +1,7 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col>
+  <v-container class="fill-height">
+    <v-row justify="center">
+      <v-col class="text-center">
         <h1>4th floor</h1>
       </v-col>
     </v-row>
