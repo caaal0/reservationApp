@@ -4,16 +4,18 @@
   import SignupForm from '@/components/SignupForm.vue';
   import { useRouter } from 'vue-router';
   import { auth } from '../firebase/firebase.js';
-  import { signOut } from 'firebase/auth';
+  import { signOut, onAuthStateChanged } from 'firebase/auth';
+  import { useAuthStore } from '../stores/auth.js';
 
   const router = useRouter();
+  const authStore = useAuthStore();
+  authStore.fetchCurrentUser(); //fetch current user right away as it loads to check if user is logged in
   const showLogin = ref(false);
   const showSignup = ref(false);
   const drawer = ref(false);
   const isLoggedIn = ref(false);
-
   const items = [
-    { title: 'Edit information', icon: 'mdi-pencil' },
+    { title: 'Edit information', icon: 'mdi-pencil' }, //TODO: make dialog for editing information (name, contact info, change email?)
     { title: 'Logout', icon: 'mdi-logout', click: logout },
   ]
 
@@ -28,6 +30,9 @@
   }
 
   function loggedIn() {
+    authStore.fetchCurrentUser();
+    // always call authStore.user if you want to get the current user after fetching it
+    // console.log(authStore.user.displayName);
     isLoggedIn.value = true;
     showLogin.value = false;
     //in the case that the user logs in from the signup form
@@ -38,6 +43,8 @@
     try{
       signOut(auth);
       isLoggedIn.value = false;
+      authStore.clearUser();
+      // authStore.logout();
       alert('Logout successful');
     } catch (error) {
       console.error('Error:', error);
@@ -60,13 +67,10 @@
         >Seated</v-app-bar-title>
       <v-spacer />
       <!-- <v-btn text to="/">Home</v-btn> -->
-      <div v-if="!isLoggedIn">
-        <v-btn text @click="showLogin = true">Login</v-btn>
-        <v-btn text @click="showSignup = true">Signup</v-btn>
-      </div>
-      <div v-else>
-         <!-- greeting and menu -->
-         <span id="greeting">Hi {{auth.currentUser.displayName}}!</span>
+
+      <div v-if="authStore.user">
+         <!-- greeting and menu will show up if someone is logged in -->
+         <span id="greeting">Hi {{authStore.user.displayName}}!</span>
          <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
@@ -84,6 +88,10 @@
             </v-list-item>
           </v-list>
          </v-menu>
+      </div>
+      <div v-else>
+        <v-btn text @click="showLogin = true">Login</v-btn>
+        <v-btn text @click="showSignup = true">Signup</v-btn>
       </div>
     </v-app-bar>
 
@@ -114,6 +122,12 @@
           prepend-icon="mdi-stairs"
           :style="{color: 'var(--black)', margin: '0 1rem 0 1rem', fontSize: '1.25rem'}"
           to="floor2"
+        ></v-list-item>
+        <v-list-item
+          title="My Reservations"
+          prepend-icon="mdi-calendar"
+          :style="{color: 'var(--black)', margin: '1.25rem 1rem 0 1rem', fontSize: '1.25rem'}"
+          to="myreservations"
         ></v-list-item>
       </v-list>
     </v-navigation-drawer>
