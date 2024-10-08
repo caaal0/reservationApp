@@ -9,6 +9,18 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 
+// Modify routes to set layout based on path pattern
+const updatedRoutes = routes.map((route) => {
+  if (route.path.startsWith('/admin')) {
+    route.meta = { layout: 'admin' } // Use Admin layout
+  } else if (route.path.startsWith('/staff')) {
+    route.meta = { layout: 'staff' } // Use Staff layout
+  } else {
+    route.meta = { layout: 'default' } // Use Default layout
+  }
+  return route
+})
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: setupLayouts(routes),
