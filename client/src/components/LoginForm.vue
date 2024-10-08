@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebase/firebase.js'; // Import Firebase auth from your config
 import { loginHelper } from '../firebase/authHelper.js';
-import { defineEmits } from 'vue';
 
 const email = ref('')
 const password = ref('')
