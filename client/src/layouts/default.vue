@@ -172,7 +172,7 @@
 }
 
 .appbarTitle {
-  color: 'var(--green-dark)';
+  color: green;
   margin: '0 0.25rem 1rem 0.25rem';
   font-size: 2.25rem;
   font-weight: bold;
@@ -183,7 +183,7 @@
 #greeting {
   font-size: 1.25rem;
   font-weight: bold;
-  color: var(--black);
+  color: black;
   align-self: center;
   margin: 0 1rem 0 1rem;
 }
