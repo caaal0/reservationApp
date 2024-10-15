@@ -14,6 +14,7 @@
     "firebase": "^10.14.0",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
+    "vue-cal": "^4.10.0",
     "vuetify": "^3.6.11"
   },
   "devDependencies": {
