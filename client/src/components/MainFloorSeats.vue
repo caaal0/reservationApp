@@ -20,19 +20,21 @@ const seats = ref([
   { x: 270, y: 195, number: 13 },
 ]);
 
+const emit = defineEmits(['seat-selected']);
+
 const selectSeat = (seatNumber) =>{
-  alert(`Seat ${seatNumber} selected`);
+  emit('seat-selected', seatNumber);
 }
 </script>
 
 <template>
   <svg width="100%" height="500px" viewBox="0 0 500 500">
     <!-- wall outline -->
-    <path d="M0,50 l0,60 l115,0 l0,260 l300,0 l0,-320 l-75,0 l0,60 l-175,0 l0,-60 z" stroke="brown" fill="transparent" stroke-width="5" />
+    <path d="M0,50 l0,60 l115,0 l0,260 l350,0 l0,-320 l-115,0 l0,60 l-175,0 l0,-60 z" stroke="brown" fill="transparent" stroke-width="5" />
     <!-- door to cr -->
     <path d="M100,50 l0,60" stroke="brown" stroke-width="2" fill="transparent" />
     <!-- counter -->
-    <rect x="305" y="112" width="50" height="175" fill="gray" />
+    <rect x="305" y="112" width="50" height="150" fill="gray" />
     <!-- Tables -->
     <rect x="180" y="112" width="125" height="30" fill="saddlebrown" />
     <rect x="115" y="175" width="30" height="125" fill="saddlebrown" />
@@ -65,6 +67,7 @@ const selectSeat = (seatNumber) =>{
       </text>
     </g>
     <!-- Stairs -->
+    <path d="M355,365 l0,-75 l105,0" stroke="black" stroke-dasharray="5,5" fill="transparent"/>
     <!-- <path
       d="
         M363,320
@@ -77,7 +80,8 @@ const selectSeat = (seatNumber) =>{
     />
     <path d="M363,355 l-10,35" stroke="blue" fill="none"/> -->
     <!-- texts -->
-    <text x="5" y="85" font-size="0.75rem" fill="saddlebrown">COMFORT ROOM</text>
+    <text x="20" y="85" font-size="0.75rem" fill="saddlebrown" font-weight="bold">RESTROOM</text>
+    <text x="390" y="330" font-size="0.75rem" fill="saddlebrown" font-weight="bold">STAIRS</text>
     <text x="325" y="140" rotate="90" font-size="1rem" fill="white">C</text>
     <text x="325" y="155" rotate="90" font-size="1rem" fill="white">O</text>
     <text x="325" y="170" rotate="90" font-size="1rem" fill="white">U</text>
