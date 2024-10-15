@@ -103,10 +103,10 @@ const specialHours = {
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
-    <v-dialog v-model="reservationDialog" max-width="350">
-      <v-card v-if="step === 1" width="350" class="text-center">
+    <v-dialog v-model="reservationDialog" max-width="350" @update:model-value="resetSteps">
+      <v-card v-if="step === 1" class="text-center">
         <v-card-title>Pick a date</v-card-title>
-        <v-card-text class="d-flex justify-center">
+        <v-card-text class="justify-center">
           <div class="date-picker">
             <vue-cal
               class="vuecal--date-picker vuecal--green-theme"
@@ -131,13 +131,15 @@ const specialHours = {
       </v-card>
       <!-- Step 2: Pick a Time -->
     <v-card v-if="step === 2">
-      <v-card-title class="text-center">Pick a time</v-card-title>
-      <v-card-text>
+      <v-card-title class="text-center">Pick a start time</v-card-title>
+      <v-card-text class="justify-center">
         <!-- Vuetify Time Picker -->
         <v-time-picker
           v-model="selectedTime"
           full-width
-          scrollable
+          height="500"
+          width="350"
+          color="green-lighten-1x"
           format="24hr"
         />
       </v-card-text>
@@ -150,7 +152,7 @@ const specialHours = {
     <!-- Step 3: Choose an Option -->
     <v-card v-if="step === 3">
       <v-card-title class="text-center">How many hours?</v-card-title>
-      <v-card-text>
+      <v-card-text class="justify-center">
         <!-- Vuetify Radio Button Group -->
         <v-radio-group v-model="selectedOption" column>
           <v-radio label="1 Hour" value="1"></v-radio>
