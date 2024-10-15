@@ -22,28 +22,30 @@ const seats = ref([
   { x: 80, y: 74, number: 28 },
   { x: 45, y: 74, number: 29 },
   { x: 10, y: 74, number: 30 },
-  { x: 210, y: 115, number: 31 },
-  { x: 275, y: 115, number: 32 },
-  { x: 365, y: 65, number: 33 },
-  { x: 355, y: 148, number: 34 },
-  { x: 355, y: 193, number: 35 },
-  { x: 355, y: 238, number: 36 },
+  { x: 220, y: 115, number: 31 },
+  { x: 285, y: 115, number: 32 },
+  { x: 375, y: 65, number: 33 },
+  { x: 403, y: 148, number: 34 },
+  { x: 403, y: 193, number: 35 },
+  { x: 403, y: 238, number: 36 },
 ]);
 
+const emit = defineEmits(['seat-selected']);
+
 const selectSeat = (seatNumber) =>{
-  alert(`Seat ${seatNumber} selected`);
+  emit('seat-selected', seatNumber);
 }
 </script>
 
 <template>
   <svg width="100%" height="500px" viewBox="0 0 500 500">
     <!-- wall outline -->
-    <path d="M0,50 l0,60 l115,0 l0,260 l300,0 l0,-320 l-75,0 l0,60 l-175,0 l0,-60 z" stroke="brown" fill="transparent" stroke-width="5" />
+    <path d="M0,50 l0,60 l115,0 l0,260 l350,0 l0,-320 l-115,0 l0,60 l-175,0 l0,-60 z" stroke="brown" fill="transparent" stroke-width="5" />
     <!-- Tables -->
     <rect x="1" y="52" width="110" height="20" fill="saddlebrown" />
-    <circle cx="255" cy="125" r="15" fill="saddlebrown" />
-    <rect x="342" y="52" width="20" height="50" fill="saddlebrown" />
-    <rect x="385" y="140" width="30" height="135" fill="saddlebrown" />
+    <circle cx="265" cy="125" r="15" fill="saddlebrown" />
+    <rect x="352" y="52" width="20" height="50" fill="saddlebrown" />
+    <rect x="433" y="140" width="30" height="135" fill="saddlebrown" />
     <rect x="116" y="195" width="205" height="45" fill="saddlebrown" />
     <rect x="130" y="338" width="200" height="30" fill="saddlebrown" />
     <!-- Seats -->
@@ -72,16 +74,7 @@ const selectSeat = (seatNumber) =>{
       </text>
     </g>
     <!-- Stairs -->
-    <!-- <path
-      d="
-        M363,320
-        a35,35 0 1,1 -35,35
-        l35,0
-        l0,-35
-        "
-      stroke="black"
-      fill="none"
-    />
-    <path d="M363,355 l-10,35" stroke="blue" fill="none"/> -->
+    <path d="M355,365 l0,-75 l105,0" stroke="black" stroke-dasharray="5,5" fill="transparent"/>
+    <text x="390" y="330" font-size="0.75rem" fill="saddlebrown" font-weight="bold">STAIRS</text>
   </svg>
 </template>
