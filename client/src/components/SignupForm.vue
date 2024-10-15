@@ -36,7 +36,7 @@ async function signup() {
         const data = await response.json();
         console.log('Signup successful:', data);
         loading.value = false;
-        // emit('signup-success');
+        // directly login after signing up
         const msg = loginHelper(email.value, password.value);
         emit('signup-success');
         // Handle success (e.g., redirect or show a message)
