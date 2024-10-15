@@ -2,6 +2,7 @@
   import AppFooter from '@/components/AppFooter.vue';
   import LoginForm from '@/components/LoginForm.vue';
   import SignupForm from '@/components/SignupForm.vue';
+  import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { auth } from '../firebase/firebase.js';
   import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -56,7 +57,7 @@
 <template>
   <v-app>
 
-    <v-app-bar app color="transparent" elevation="1">
+    <v-app-bar app color="white" elevation="1">
       <template v-slot:prepend>
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
