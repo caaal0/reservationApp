@@ -11,6 +11,7 @@ import 'vuetify/styles'
 // Composables
 import { createVuetify } from 'vuetify'
 import { md3 } from 'vuetify/blueprints'
+import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -19,4 +20,7 @@ export default createVuetify({
   },
   blueprint: md3,
   mobileBreakpoint: 'sm',
+  components: {
+    VTimePicker,
+  },
 })
