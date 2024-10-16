@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
+import { useAuthStore } from '@/stores/auth';
 
 const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
@@ -11,6 +12,32 @@ const selectedDay = ref(null)
 const selectedTime = ref(null)
 const selectedOption = ref(null)
 const visibleSnackbar = ref(false)
+//TODO: optimize with lazy loading per week
+//get the approved reservations from the database and display them on the calendar
+async function loadEvents() {
+  //for approved reservations
+  const response = await reservationHelper.getApprovedReservations()
+  if(response.success){
+    //load events into the calendar when the proper seat is selected
+    for(let reservation of response.data){
+      if(reservation.seatNo == props.selectedSeat) {
+        const newEvent = {
+        title: `Reserved`,
+        start: new Date(reservation.startTime),
+        end: new Date(reservation.endTime),
+        allDay: false,
+        class: 'reserved',
+        }
+        events.value.push(newEvent)
+      }
+    }
+  }else{
+    console.log(response.error)
+    alert("Error loading events")
+  }
+  //to get this user's pending reservations
+}
+loadEvents()
 
 const emit = defineEmits(['close'])
 
@@ -309,6 +336,12 @@ v-card-actions v-btn v-icon {
 
 .requested {
   background-color: var(--red-medium);
+  color: white;
+  font-size: 0.8rem;
+}
+
+.reserved {
+  background-color: var(--green-medium);
   color: white;
   font-size: 0.8rem;
 }

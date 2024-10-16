@@ -48,20 +48,13 @@ async function createReservation(seatNumber, startTime, endTime){
   }
 }
 
-async function getMyReservations(){
+async function getApprovedReservations(){
   try{
-    const authStore = useAuthStore();
-    const userId = authStore.user?.uid;
-    // Check if the user is logged in
-    if (!userId) {
-      throw new Error("User not logged in");
-    }
 
-    const response = await fetch(`http://localhost:8080/reservations`, {
+    const response = await fetch(`http://localhost:8080/reservations/approved`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authStore.token}`,
       },
     });
 
@@ -82,4 +75,4 @@ async function getMyReservations(){
   }
 }
 
-export default { createReservation };
+export default { createReservation, getApprovedReservations };
