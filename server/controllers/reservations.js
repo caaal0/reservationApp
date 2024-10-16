@@ -165,6 +165,7 @@ const getPendingReservations = async (req, res) => {
 			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
 			let startTime = doc.data().startTime.toDate();
 			let endTime = doc.data().endTime.toDate();
+			let createdAt = doc.data().createdAt.toDate();
 
 			pendingArr.push(doc.data());
 
@@ -172,12 +173,46 @@ const getPendingReservations = async (req, res) => {
 
 			pendingArr[latestAdded].startTime = startTime;
 			pendingArr[latestAdded].endTime = endTime;
+			pendingArr[latestAdded].createdAt = createdAt;
 		});
 
-		res.send(pendingArr);
+		res.send({ success: true, data: pendingArr });
 
 	}catch (err){
 		res.send({ success: false, msg: 'Unable to get pending reservations', error: err.message });
+	}
+}
+
+const getApprovedReservations = async (req, res) => {
+
+	try{
+		const approvedSnapshots = await RESERVATIONSREF.where('status', '==', 'approved').get();
+
+		if(approvedSnapshots.empty){
+			throw new Error('No pending reservations');
+		}
+
+		let approvedArr = [];
+
+		approvedSnapshots.forEach(doc => {
+			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
+			let startTime = doc.data().startTime.toDate();
+			let endTime = doc.data().endTime.toDate();
+			let createdAt = doc.data().createdAt.toDate();
+
+			approvedArr.push(doc.data());
+
+			let latestAdded = approvedArr.length - 1;
+
+			approvedArr[latestAdded].startTime = startTime;
+			approvedArr[latestAdded].endTime = endTime;
+			approvedArr[latestAdded].createdAt = createdAt;
+		});
+
+		res.send({ success: true, data: approvedArr });
+
+	}catch (err){
+		res.send({ success: false, msg: 'Unable to get approved reservations', error: err.message });
 	}
 }
 
@@ -211,5 +246,6 @@ export default {
 	updateReservation,
 	deleteReservation,
 	getPendingReservations,
+	getApprovedReservations,
 	actionReservation
 };

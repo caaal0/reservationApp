@@ -15,6 +15,7 @@ router.post('/login', auth.login);
 
 // Reservation management
 router.get('/reservations', reservations.getReservations);
+router.get('/reservations/approved', reservations.getApprovedReservations);
 router.get('/reservations/pending', reservations.getPendingReservations);
 router.put('/reservations/:id&:action', reservations.actionReservation);
 router.get('/reservations/:id', reservations.getReservation);
