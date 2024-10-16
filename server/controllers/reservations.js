@@ -13,6 +13,7 @@ const getReservations = async (req, res) => {
 			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
 			let startTime = doc.data().startTime.toDate();
 			let endTime = doc.data().endTime.toDate();
+			let createdAt = doc.data().createdAt.toDate();
 
 			reservationsArr.push(doc.data());
 
@@ -20,6 +21,7 @@ const getReservations = async (req, res) => {
 
 			reservationsArr[latestAdded].startTime = startTime;
 			reservationsArr[latestAdded].endTime = endTime;
+			reservationsArr[latestAdded].createdAt = createdAt;
 		});
 
 		res.send(reservationsArr);
@@ -49,6 +51,7 @@ const getReservation = async (req, res) => {
 
 		reservation.startTime = response.data().startTime.toDate();
 		reservation.endTime = response.data().endTime.toDate();
+		reservation.createdAt = response.data().createdAt.toDate();
 
 		res.status(200).send(reservation);
 
@@ -60,24 +63,27 @@ const getReservation = async (req, res) => {
 const createReservation = async (req, res) => {
 
 	try{
-		const {userId, seatNo, startTime, endTime, status, actionBy} = req.body;
+		const {userId, seatNo, startTime, endTime, status, actionBy, createdAt} = req.body;
 		const startTimetoDate = new Date(startTime);
 		const endTimetoDate = new Date(endTime);
+		const createdAttoDate = new Date(createdAt);
 		const newReservation = {
 			userId: userId,
 			seatNo: seatNo,
 			startTime: Firestore.Timestamp.fromDate(startTimetoDate),
 			endTime: Firestore.Timestamp.fromDate(endTimetoDate),
 			status: status,
-			actionBy: actionBy
+			actionBy: actionBy,
+			createdAt: Firestore.Timestamp.fromDate(createdAttoDate)
 		}
 		if(!newReservation.userId || !newReservation.seatNo || !newReservation.startTime || !newReservation.endTime){
 			throw new Error('Invalid reservation');
 		}
+		console.log('newReservation:', newReservation);
 		//TODO: validate each field if they exist in the db as well
 		const response = await db.collection("reservations").add(newReservation); //auto-id
 		// const response = await db.collection("reservations").doc("1").set(newReservation); //custom-id
-		res.status(201).send(response);
+		res.status(201).send({ success: true, msg: 'Reservation created', data: newReservation });
 
 	}catch (err){
 		res.send({ success: false, msg: 'Unable to create reservation', error: err.message });
