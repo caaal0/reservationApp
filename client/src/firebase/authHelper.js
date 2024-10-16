@@ -23,7 +23,7 @@ export async function loginHelper(email, password) {
       // setPersistence(auth, browserLocalPersistence);
       // emit('login-success');
       authStore.fetchCurrentUser();
-      return{success: true, data};
+      return data;
     } else {
       console.error('Login failed');
       alert('Login failed');
