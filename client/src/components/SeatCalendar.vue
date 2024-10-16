@@ -4,11 +4,11 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 
 const reservationDialog = ref(false)
-const step = ref(1); // Tracks the current step of the reservation process
+const step = ref(1) // Tracks the current step of the reservation process
 // User choices
-const selectedDay = ref(null);
-const selectedTime = ref(null);
-const selectedOption = ref(null);
+const selectedDay = ref(null)
+const selectedTime = ref(null)
+const selectedOption = ref(null)
 
 const emit = defineEmits(['close'])
 
@@ -21,26 +21,50 @@ function makeReservation() {
 }
 
 function onCellClick(event) {
-  // Extract just the date portion (ignores time)
-  const clickedDate = new Date(event).toISOString().split('T')[0]; // "YYYY-MM-DD" format
-  selectedDay.value = clickedDate;
-  // console.log("Selected Day:", selectedDay.value);
+  // alert(event)
+  const clickedDate = new Date(event);
+  // Extract the year, month, and day in local time
+  const year = clickedDate.getFullYear();
+  const month = String(clickedDate.getMonth() + 1).padStart(2, '0'); // getMonth is 0-indexed
+  const day = String(clickedDate.getDate()).padStart(2, '0');
+
+  // Combine into "YYYY-MM-DD" format
+  selectedDay.value = `${year}-${month}-${day}`;
 }
 
 function nextStep() {
-  step.value += 1;
+  step.value += 1
 }
 
 function prevStep() {
-  step.value -= 1;
+  step.value -= 1
 }
 
 function finishReservation() {
   reservationDialog.value = false;
-  console.log("Date:", selectedDay.value);
-  console.log("Time:", selectedTime.value);
-  console.log("Option:", selectedOption.value);
+  console.log("Date:", selectedDay.value)
+  console.log("Time:", selectedTime.value)
+  console.log("Option:", selectedOption.value)
+  createEvent()
+  //call firebase function to send data to the database
   resetSteps()
+}
+
+function createEvent(){
+  //calculate end time
+  const durationInHours = parseInt(selectedOption.value);
+  const startTime = new Date(`${selectedDay.value}T${selectedTime.value}`)
+  const endTime = new Date(startTime)
+  endTime.setHours(startTime.getHours() + durationInHours)
+  //create new event and push to events array
+  const newEvent = {
+    title: `Requested`,
+    start: startTime,
+    end: endTime,
+    allDay: false,
+    class: 'requested',
+  }
+  events.value.push(newEvent)
 }
 
 function resetSteps() {
@@ -56,7 +80,7 @@ const minDate = computed(() => {
   return today;
 })
 
-const events = []
+const events = ref([])
 
 const specialHours = {
   // 7: {
@@ -80,15 +104,16 @@ const specialHours = {
           <vue-cal
             class="vuecal--green-theme"
             active-view="week"
-            :min-cell-width="120"
+            :min-cell-width="125"
             :snap-to-time="30"
             :disable-views="['day', 'month', 'year', 'years']"
             :min-date="minDate"
-            :time-step="30"
+            :time-step="60"
             :special-hours="specialHours ? specialHours : {}"
             :cell-click-hold="false"
             :drag-to-create-event="false"
             :editable-events="{ title: false, drag: true, resize: false, delete: true, create: true }"
+            :events="events"
             hide-view-selector
             show-time-in-cells
             />
@@ -248,5 +273,11 @@ v-card {
 
 v-card-actions v-btn v-icon {
   color: var(--green-dark);
+}
+
+.requested {
+  background-color: var(--red-medium);
+  color: white;
+  font-size: 0.8rem;
 }
 </style>
