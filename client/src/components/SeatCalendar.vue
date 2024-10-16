@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
+import reservationHelper from '../firebase/reservationsHelper'
 
 const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
@@ -9,6 +10,7 @@ const step = ref(1) // Tracks the current step of the reservation process
 const selectedDay = ref(null)
 const selectedTime = ref(null)
 const selectedOption = ref(null)
+const visibleSnackbar = ref(false)
 
 const emit = defineEmits(['close'])
 
@@ -16,7 +18,11 @@ const props = defineProps({
   selectedSeat: Number,
 })
 
-function makeReservation() {
+function showSnackbar() {
+  visibleSnackbar.value = true
+}
+
+function openReservationDialog() {
   reservationDialog.value = true;
 }
 
@@ -40,22 +46,16 @@ function prevStep() {
   step.value -= 1
 }
 
-function finishReservation() {
-  reservationDialog.value = false;
-  console.log("Date:", selectedDay.value)
-  console.log("Time:", selectedTime.value)
-  console.log("Option:", selectedOption.value)
-  createEvent()
-  //call firebase function to send data to the database
-  resetSteps()
-}
-
-function createEvent(){
-  //calculate end time
+function calculateEndTime() {
   const durationInHours = parseInt(selectedOption.value);
   const startTime = new Date(`${selectedDay.value}T${selectedTime.value}`)
   const endTime = new Date(startTime)
   endTime.setHours(startTime.getHours() + durationInHours)
+
+  return {startTime, endTime}
+}
+
+function createEvent(startTime, endTime) {
   //create new event and push to events array
   const newEvent = {
     title: `Requested`,
@@ -72,6 +72,26 @@ function resetSteps() {
   selectedDay.value = null;
   selectedTime.value = null;
   selectedOption.value = null;
+}
+
+async function finishReservation() {
+  reservationDialog.value = false;
+  console.log("Date:", selectedDay.value)
+  console.log("Time:", selectedTime.value)
+  console.log("Option:", selectedOption.value)
+  const {startTime, endTime} = calculateEndTime()
+  //call firebase function to send data to the database
+  const msg = await reservationHelper.createReservation(props.selectedSeat, startTime, endTime)
+  if(msg.success){
+    console.log("Reservation created successfully")
+    //create event on the calendar
+    createEvent(startTime, endTime)
+    resetSteps()
+    showSnackbar()
+  } else {
+    console.log(msg.error)
+    alert("Error creating reservation")
+  }
 }
 
 const minDate = computed(() => {
@@ -124,7 +144,7 @@ const specialHours = {
       icon="$plus"
       variant="text"
       class="event-create-btn"
-      @click="makeReservation"
+      @click="openReservationDialog"
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
@@ -181,7 +201,7 @@ const specialHours = {
         <!-- Vuetify Radio Button Group -->
         <v-radio-group v-model="selectedOption" column>
           <v-radio label="1 Hour" value="1"></v-radio>
-          <v-radio label="3 Hours" value="2"></v-radio>
+          <v-radio label="3 Hours" value="3"></v-radio>
           <v-radio label="5 Hours" value="5"></v-radio>
         </v-radio-group>
       </v-card-text>
@@ -192,6 +212,18 @@ const specialHours = {
     </v-card>
     </v-dialog>
   </v-card>
+  <v-snackbar v-model="visibleSnackbar" color="green-darken-1" timeout="3000">
+    Reservation created successfully!
+    <template v-slot:actions>
+      <v-btn
+          color="white"
+          variant="text"
+          @click="visibleSnackbar = false"
+        >
+          Close
+        </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <style>
