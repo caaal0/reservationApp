@@ -125,6 +125,7 @@
           to="floor2"
         ></v-list-item>
         <v-list-item
+          v-if="authStore.user"
           title="My Reservations"
           prepend-icon="mdi-calendar"
           :style="{color: 'var(--black)', margin: '1.25rem 1rem 0 1rem', fontSize: '1.25rem'}"
