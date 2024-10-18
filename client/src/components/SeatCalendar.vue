@@ -63,7 +63,7 @@ loadEvents()
 const emit = defineEmits(['close'])
 
 const props = defineProps({
-  selectedSeat: Number,
+  selectedSeat: String,
 })
 
 function showSnackbar() {
