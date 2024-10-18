@@ -34,13 +34,13 @@ const getReservations = async (req, res) => {
 const getReservation = async (req, res) => {
 
 	try{
-		const { id } = req.params;
+		const { id: reservationId } = req.params;
 		
-		if(!id) {
+		if(!reservationId) {
 			throw new Error('Invalid id');
 		}
 
-		const reservationRef = db.collection('reservations').doc(id);
+		const reservationRef = db.collection('reservations').doc(reservationId);
 		const response = await reservationRef.get();
 
 		if(!response.exists){
@@ -153,7 +153,53 @@ const deleteReservation = async (req, res) => {
 const getPendingReservations = async (req, res) => {
 
 	try{
-		const pendingSnapshots = await RESERVATIONSREF.where('status', '==', 'pending').get();
+		let today = new Date();	
+		today.setHours(0, 0, 0, 0);
+		const pendingSnapshots = await RESERVATIONSREF
+			.where('status', '==', 'pending')
+			.where('startTime', '>=', Firestore.Timestamp.fromDate(today))
+			.get();
+
+		if(pendingSnapshots.empty){
+			throw new Error('No pending reservations');
+		}
+
+		let pendingArr = [];
+
+		pendingSnapshots.forEach(doc => {
+			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
+			let startTime = doc.data().startTime.toDate();
+			let endTime = doc.data().endTime.toDate();
+			let createdAt = doc.data().createdAt.toDate();
+
+			pendingArr.push(doc.data());
+
+			let latestAdded = pendingArr.length - 1;
+
+			pendingArr[latestAdded].startTime = startTime;
+			pendingArr[latestAdded].endTime = endTime;
+			pendingArr[latestAdded].createdAt = createdAt;
+		});
+
+		res.send({ success: true, data: pendingArr });
+
+	}catch (err){
+		res.send({ success: false, msg: 'Unable to get pending reservations', error: err.message });
+	}
+}
+
+const getMyPendingReservations = async (req, res) => {
+
+	try{
+		const userId = req.params.id;
+		console.log(userId)
+		let today = new Date();	
+		today.setHours(0, 0, 0, 0);
+		const pendingSnapshots = await RESERVATIONSREF
+			.where('userId', '==', userId)
+			.where('status', '==', 'pending')
+			.where('startTime', '>=', Firestore.Timestamp.fromDate(today))
+			.get();
 
 		if(pendingSnapshots.empty){
 			throw new Error('No pending reservations');
@@ -246,6 +292,7 @@ export default {
 	updateReservation,
 	deleteReservation,
 	getPendingReservations,
+	getMyPendingReservations,
 	getApprovedReservations,
 	actionReservation
 };
