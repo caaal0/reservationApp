@@ -1,30 +1,53 @@
 <script setup>
 import { ref } from 'vue';
-//TODO: make pinia store for seats
-const availableSeats = ref([37, 38, 40, 41, 42, 43, 44, 45, 46, 49, 51, 52, 54, 56, 58]);
+import { useSeatsStore } from '@/stores/seats';
+
+const seatsStore = useSeatsStore();
+const availableSeats = ref([]);
+
+watchEffect(() => {
+  if(seatsStore.loading) {
+    console.log('Loading seats');
+  } else {
+    console.log(seatsStore.seats);
+    console.log('Seats loaded');
+    addAvailableSeats();
+  }
+});
+seatsStore.listenToSeats();
+
+function addAvailableSeats(){
+  availableSeats.value = [];
+  for(const seat of seatsStore.seats) {
+    if(seat.available == true) {
+      availableSeats.value.push(seat.id);
+    }
+  }
+  console.log(availableSeats.value);
+}
 
 // Seats positions with numbers
 const seats = ref([
-  { x: 148, y: 270, number: 37 },
-  { x: 148, y: 225, number: 38 },
-  { x: 148, y: 180, number: 39 },
-  { x: 195, y: 145, number: 40 },
-  { x: 250, y: 145, number: 41 },
-  { x: 305, y: 145, number: 42 },
-  { x: 405, y: 310, number: 43 },
-  { x: 350, y: 310, number: 44 },
-  { x: 295, y: 310, number: 45 },
-  { x: 240, y: 310, number: 46 },
-  { x: 185, y: 310, number: 47 },
-  { x: 237, y: 272, number: 48 },
-  { x: 282, y: 272, number: 49 },
-  { x: 330, y: 225, number: 50 },
-  { x: 282, y: 180, number: 51 },
-  { x: 237, y: 180, number: 52 },
-  { x: 190, y: 225, number: 53 },
-  { x: 380, y: 205, number: 54 },
-  { x: 380, y: 160, number: 55 },
-  { x: 430, y: 270, number: 58 },
+  { x: 148, y: 270, number: "37" },
+  { x: 148, y: 225, number: "38" },
+  { x: 148, y: 180, number: "39" },
+  { x: 195, y: 145, number: "40" },
+  { x: 250, y: 145, number: "41" },
+  { x: 305, y: 145, number: "42" },
+  { x: 405, y: 310, number: "43" },
+  { x: 350, y: 310, number: "44" },
+  { x: 295, y: 310, number: "45" },
+  { x: 240, y: 310, number: "46" },
+  { x: 185, y: 310, number: "47" },
+  { x: 237, y: 272, number: "48" },
+  { x: 282, y: 272, number: "49" },
+  { x: 330, y: 225, number: "50" },
+  { x: 282, y: 180, number: "51" },
+  { x: 237, y: 180, number: "52" },
+  { x: 190, y: 225, number: "53" },
+  { x: 380, y: 205, number: "54" },
+  { x: 380, y: 160, number: "55" },
+  { x: 430, y: 270, number: "58" },
 ]);
 
 const emit = defineEmits(['seat-selected']);
@@ -78,8 +101,8 @@ const selectSeat = (seatNumber) =>{
         y="130"
         width="43"
         height="125"
-        :fill="availableSeats.includes(56) ? 'green' : 'red'"
-        @click="selectSeat(56)"
+        :fill="availableSeats.includes('56') ? 'green' : 'red'"
+        @click="selectSeat('56')"
         style="cursor: pointer"
         />
         <text
@@ -96,8 +119,8 @@ const selectSeat = (seatNumber) =>{
         y="130"
         width="23"
         height="125"
-        :fill="availableSeats.includes(57) ? 'green' : 'red'"
-        @click="selectSeat(57)"
+        :fill="availableSeats.includes('57') ? 'green' : 'red'"
+        @click="selectSeat('57')"
         style="cursor: pointer"
         />
         <text

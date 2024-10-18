@@ -1,33 +1,55 @@
 <script setup>
 import { ref } from 'vue';
-//TODO: make pinia store for seats
-const availableSeats = ref([14,15,17,18,19,20,21,22,24,25,26,27,29,30,32,33,35,36]);
+import { useSeatsStore } from '@/stores/seats';
 
+const seatsStore = useSeatsStore();
+const availableSeats = ref([]);
+
+watchEffect(() => {
+  if(seatsStore.loading) {
+    console.log('Loading seats');
+  } else {
+    console.log(seatsStore.seats);
+    console.log('Seats loaded');
+    addAvailableSeats();
+  }
+});
+seatsStore.listenToSeats();
+
+function addAvailableSeats(){
+  availableSeats.value = [];
+  for(const seat of seatsStore.seats) {
+    if(seat.available == true) {
+      availableSeats.value.push(seat.id);
+    }
+  }
+  console.log(availableSeats.value);
+}
 // Seats positions with numbers
 const seats = ref([
-  { x: 280, y: 310, number: 14 },
-  { x: 235, y: 310, number: 15 },
-  { x: 190, y: 310, number: 16 },
-  { x: 145, y: 310, number: 17 },
-  { x: 122, y: 242, number: 18 },
-  { x: 162, y: 242, number: 19 },
-  { x: 207, y: 242, number: 20 },
-  { x: 247, y: 242, number: 21 },
-  { x: 287, y: 242, number: 22 },
-  { x: 287, y: 168, number: 23 },
-  { x: 247, y: 168, number: 24 },
-  { x: 207, y: 168, number: 25 },
-  { x: 162, y: 168, number: 26 },
-  { x: 122, y: 168, number: 27 },
-  { x: 80, y: 74, number: 28 },
-  { x: 45, y: 74, number: 29 },
-  { x: 10, y: 74, number: 30 },
-  { x: 220, y: 115, number: 31 },
-  { x: 285, y: 115, number: 32 },
-  { x: 375, y: 65, number: 33 },
-  { x: 403, y: 148, number: 34 },
-  { x: 403, y: 193, number: 35 },
-  { x: 403, y: 238, number: 36 },
+  { x: 280, y: 310, number: "14" },
+  { x: 235, y: 310, number: "15" },
+  { x: 190, y: 310, number: "16" },
+  { x: 145, y: 310, number: "17" },
+  { x: 122, y: 242, number: "18" },
+  { x: 162, y: 242, number: "19" },
+  { x: 207, y: 242, number: "20" },
+  { x: 247, y: 242, number: "21" },
+  { x: 287, y: 242, number: "22" },
+  { x: 287, y: 168, number: "23" },
+  { x: 247, y: 168, number: "24" },
+  { x: 207, y: 168, number: "25" },
+  { x: 162, y: 168, number: "26" },
+  { x: 122, y: 168, number: "27" },
+  { x: 80, y: 74, number: "28" },
+  { x: 45, y: 74, number: "29" },
+  { x: 10, y: 74, number: "30" },
+  { x: 220, y: 115, number: "31" },
+  { x: 285, y: 115, number: "32" },
+  { x: 375, y: 65, number: "33" },
+  { x: 403, y: 148, number: "34" },
+  { x: 403, y: 193, number: "35" },
+  { x: 403, y: 238, number: "36" },
 ]);
 
 const emit = defineEmits(['seat-selected']);
