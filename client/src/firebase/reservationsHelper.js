@@ -75,4 +75,31 @@ async function getApprovedReservations(){
   }
 }
 
-export default { createReservation, getApprovedReservations };
+async function getMyPendingReservations(){
+  try{
+    const authStore = useAuthStore();
+    const userId = authStore.user?.uid;
+    const response = await fetch(`http://localhost:8080/reservations/pending/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Reservation failed');
+      alert('Reservation failed');
+      return data;
+    }
+  }catch (error){
+    console.error('Error:', error);
+    alert('Reservation error.');
+    return {success: false, error};
+  }
+}
+
+export default { createReservation, getApprovedReservations, getMyPendingReservations };

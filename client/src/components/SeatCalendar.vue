@@ -5,6 +5,7 @@ import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
 import { useAuthStore } from '@/stores/auth';
 
+const authStore = useAuthStore()
 const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
 // User choices
@@ -16,10 +17,10 @@ const visibleSnackbar = ref(false)
 //get the approved reservations from the database and display them on the calendar
 async function loadEvents() {
   //for approved reservations
-  const response = await reservationHelper.getApprovedReservations()
-  if(response.success){
+  const approvedReservations = await reservationHelper.getApprovedReservations()
+  if(approvedReservations.success){
     //load events into the calendar when the proper seat is selected
-    for(let reservation of response.data){
+    for(let reservation of approvedReservations.data){
       if(reservation.seatNo == props.selectedSeat) {
         const newEvent = {
         title: `Reserved`,
@@ -32,10 +33,30 @@ async function loadEvents() {
       }
     }
   }else{
-    console.log(response.error)
+    console.log(approvedReservations.error)
     alert("Error loading events")
   }
   //to get this user's pending reservations
+  if(authStore.user){
+    const myPendingReservations = await reservationHelper.getMyPendingReservations()
+    if(myPendingReservations.success){
+      for(let reservation of myPendingReservations.data){
+        if(reservation.seatNo == props.selectedSeat) {
+          const newEvent = {
+          title: `Requested`,
+          start: new Date(reservation.startTime),
+          end: new Date(reservation.endTime),
+          allDay: false,
+          class: 'requested',
+          }
+          events.value.push(newEvent)
+        }
+      }
+    }else{
+      console.log(myPendingReservations.error)
+      alert("Error loading events")
+    }
+  }
 }
 loadEvents()
 
