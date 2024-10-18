@@ -18,7 +18,7 @@ router.get('/reservations', reservations.getReservations);
 router.get('/reservations/approved', reservations.getApprovedReservations);
 router.get('/reservations/pending', reservations.getPendingReservations);
 router.get('/reservations/pending/:id', reservations.getMyPendingReservations);
-router.put('/reservations/:id&:action', reservations.actionReservation);
+router.put('/reservations/:action', reservations.actionReservation);
 router.get('/reservations/:id', reservations.getReservation);
 router.post('/reservations', reservations.createReservation);
 router.put('/reservations/:id', reservations.updateReservation);

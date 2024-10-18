@@ -192,7 +192,6 @@ const getMyPendingReservations = async (req, res) => {
 
 	try{
 		const userId = req.params.id;
-		console.log(userId)
 		let today = new Date();	
 		today.setHours(0, 0, 0, 0);
 		const pendingSnapshots = await RESERVATIONSREF
@@ -264,24 +263,35 @@ const getApprovedReservations = async (req, res) => {
 
 const actionReservation = async (req, res) => {
 	
+	const { action } = req.params;
+	const { reservationId, actionById } = req.body;
 	try{
-		const { id, action } = req.params;
 		const validActions = ['approved', 'rejected', 'cancelled'];
-		const reservation = await db.collection('reservations').doc(id).get();
-
+		const reservation = await db.collection('reservations').doc(reservationId).get();
+		
 		if(!reservation.exists){
 			throw new Error('Reservation not found');
 		}
-	
+		
 		if(!validActions.includes(action)){
 			throw new Error('Invalid action');
 		}
-	
-		reservation.ref.update({ status: action });
-		res.status(200).send(reservation.data());
+		
+		reservation.ref.update({ status: action, actionBy: actionById });
+		
+		if(action == 'approved') {
+			// reservation.ref.update({ actionBy: 'admin' });
+			//add the reservation id to the seat
+			const seatRef = db.collection('seats').doc(reservation.data().seatNo);
+			seatRef.update({ approvedReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			//add as active reservation for the customer as well
+			const userRef = db.collection('customers').doc(reservation.data().userId);
+			userRef.update({ activeReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+		}
+		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
 
 	}catch (err){
-		res.send({ success: false, msg: `Unable to perform action (${action}) on reservation ${id}`, error: err.message });
+		res.send({ success: false, msg: `Unable to perform ${action} on reservation ${reservationId}`, error: err.message });
 	}
 }
 
