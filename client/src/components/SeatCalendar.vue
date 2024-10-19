@@ -71,6 +71,10 @@ function showSnackbar() {
 }
 
 function openReservationDialog() {
+  if(!authStore.user){
+    alert("Please login to make a reservation")
+    return
+  }
   reservationDialog.value = true;
 }
 
