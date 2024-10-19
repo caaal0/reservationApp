@@ -9,7 +9,7 @@ watchEffect(() => {
   if(seatsStore.loading) {
     console.log('Loading seats');
   } else {
-    console.log(seatsStore.seats);
+    // console.log(seatsStore.seats);
     console.log('Seats loaded');
     addAvailableSeats();
   }
@@ -23,7 +23,7 @@ function addAvailableSeats(){
       availableSeats.value.push(seat.id);
     }
   }
-  console.log(availableSeats.value);
+  // console.log(availableSeats.value);
 }
 
 // Seats positions with numbers
