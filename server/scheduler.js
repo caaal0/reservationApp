@@ -48,13 +48,43 @@ async function updateSeatAvailability() {
   }
 }
 
-// Create a new CronJob to run every minute (adjustable schedule)
-const job = new CronJob('* * * * *', () => {
+// Function to reset customer's current reservation after reservation ends
+async function clearCustomerCurrentReservation() {
+  const reservationsRef = db.collection('reservations');
+  const currentTime = new Date();
+
+  try {
+    const reservationsSnapshot = await reservationsRef.get();
+
+    reservationsSnapshot.forEach(async (reservationDoc) => {
+      const reservationData = reservationDoc.data();
+      const endTime = reservationData.endTime.toDate();
+
+      // Check if the current time is past the reservation's end time
+      if (currentTime > endTime) {
+        const userId = reservationData.userID;
+        const userRef = db.collection('customers').doc(userId);
+
+        await userRef.update({ currentReservation: '' });
+        console.log(`Cleared current reservation for user ${userId}`);
+      }
+    });
+  } catch (error) {
+    console.error('Error clearing current reservation:', error);
+  }
+}
+
+// Cron job for seat availability (runs every minute)
+const updateSeatAvailabilityJob = new CronJob('* * * * *', () => {
   console.log('Checking seat availability...');
   updateSeatAvailability();
 });
 
-// Start the job
-// job.start();
+// Cron job for clearing current reservations (runs every minute)
+const clearCurrentReservationJob = new CronJob('*/5 * * * *', () => {
+  console.log('Checking reservations to clear currentReservation...');
+  clearCustomerCurrentReservation();
+});
 
-export {job};
+// Export both jobs
+export { updateSeatAvailabilityJob, clearCurrentReservationJob };
