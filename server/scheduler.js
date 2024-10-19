@@ -3,7 +3,7 @@
 // const { firestore } = require('./firebase'); // Ensure Firebase is initialized here
 
 import { CronJob } from 'cron';
-import { admin } from 'firebase-admin';
+import admin from 'firebase-admin';
 import db from './firebase.js';
 
 // This function checks reservations and updates seat availability.
@@ -55,4 +55,6 @@ const job = new CronJob('* * * * *', () => {
 });
 
 // Start the job
-job.start();
+// job.start();
+
+export {job};
