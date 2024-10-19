@@ -79,10 +79,12 @@ const createReservation = async (req, res) => {
 		if(!newReservation.userId || !newReservation.seatNo || !newReservation.startTime || !newReservation.endTime){
 			throw new Error('Invalid reservation');
 		}
-		console.log('newReservation:', newReservation);
-		//TODO: validate each field if they exist in the db as well
+		// console.log('newReservation:', newReservation);
 		const response = await db.collection("reservations").add(newReservation); //auto-id
 		// const response = await db.collection("reservations").doc("1").set(newReservation); //custom-id
+		//add the reservation id as the currentReservation of the user
+		const userRef = db.collection('customers').doc(userId);
+		userRef.update({ currentReservation: response.id });
 		res.status(201).send({ success: true, msg: 'Reservation created', data: newReservation });
 
 	}catch (err){
