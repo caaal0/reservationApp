@@ -282,13 +282,13 @@ const actionReservation = async (req, res) => {
 		reservation.ref.update({ status: action, actionBy: actionById });
 		
 		if(action == 'approved') {
-			// reservation.ref.update({ actionBy: 'admin' });
 			//add the reservation id to the seat
 			const seatRef = db.collection('seats').doc(reservation.data().seatNo);
 			seatRef.update({ approvedReservations: Firestore.FieldValue.arrayUnion(reservationId) });
-			//add as active reservation for the customer as well
+		}else if(action == 'rejected' || action == 'cancelled'){
+			//remove the reservation id from user's currentReservation
 			const userRef = db.collection('customers').doc(reservation.data().userId);
-			userRef.update({ activeReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			userRef.update({ currentReservation: '' });
 		}
 		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
 
