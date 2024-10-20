@@ -263,6 +263,41 @@ const getApprovedReservations = async (req, res) => {
 	}
 }
 
+const getMyCurrentReservation = async (req, res) => {
+	
+	try{
+		const { userId } = req.body;
+		const userRef = db.collection('customers').doc(userId);
+		const user = await userRef.get();
+
+		if(!user.exists){
+			throw new Error('User not found');
+		}
+
+		const currentReservationId = user.data().currentReservation;
+		if(currentReservationId == ''){
+			throw new Error('No current reservation');
+		}
+		const reservationRef = db.collection('reservations').doc(currentReservationId);
+		const reservation = await reservationRef.get();
+
+		if(!reservation.exists){
+			throw new Error('Reservation not found');
+		}
+
+		const currentReservation = reservation.data();
+
+		currentReservation.startTime = reservation.data().startTime.toDate();
+		currentReservation.endTime = reservation.data().endTime.toDate();
+		currentReservation.createdAt = reservation.data().createdAt.toDate();
+
+		res.send({ success: true, data: currentReservation });
+
+	}catch (err){
+		res.send({ success: false, msg: 'Unable to get current reservation', error: err.message });
+	}
+}
+
 const actionReservation = async (req, res) => {
 	
 	const { action } = req.params;
@@ -306,5 +341,6 @@ export default {
 	getPendingReservations,
 	getMyPendingReservations,
 	getApprovedReservations,
+	getMyCurrentReservation,
 	actionReservation
 };
