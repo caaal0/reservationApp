@@ -5,6 +5,7 @@
 import { CronJob } from 'cron';
 import admin from 'firebase-admin';
 import db from './firebase.js';
+import Firestore from '@google-cloud/firestore';
 
 // This function checks reservations and updates seat availability.
 async function updateSeatAvailability() {
@@ -51,10 +52,12 @@ async function updateSeatAvailability() {
 // Function to reset customer's current reservation after reservation ends
 async function clearCustomerCurrentReservation() {
   const reservationsRef = db.collection('reservations');
+  const customerRef = db.collection('customers');
   const currentTime = new Date();
 
   try {
-    const reservationsSnapshot = await reservationsRef.get();
+    const reservationsSnapshot = await reservationsRef.where('status', '==', 'approved').get();
+    // console.log('reservationsSnapshot:', reservationsSnapshot);
 
     reservationsSnapshot.forEach(async (reservationDoc) => {
       const reservationData = reservationDoc.data();
@@ -62,11 +65,22 @@ async function clearCustomerCurrentReservation() {
 
       // Check if the current time is past the reservation's end time
       if (currentTime > endTime) {
-        const userId = reservationData.userID;
+        const userId = reservationData.userId;
+        // console.log(`Reservation ${reservationDoc.id} has ended for user ${userId}`);
         const userRef = db.collection('customers').doc(userId);
+        const user = (await userRef.get()).data();
 
-        await userRef.update({ currentReservation: '' });
-        console.log(`Cleared current reservation for user ${userId}`);
+        if(user.currentReservation === reservationDoc.id){
+          await userRef.update({ currentReservation: '' });
+          // console.log(reservationData);
+          // console.log(user);
+          console.log(`Cleared current reservation for user ${userId} with reservationId ${reservationDoc.id}`);
+          //also move the cleared reservation to the past reservation of the seat
+          const seatRef = db.collection('seats').doc(reservationData.seatNo);
+          await seatRef.update({ pastReservations: Firestore.FieldValue.arrayUnion(reservationDoc.id) });
+          //also remove the reservation from the seat's approvedReservations
+          await seatRef.update({ approvedReservations: Firestore.FieldValue.arrayRemove(reservationDoc.id) });
+        }
       }
     });
   } catch (error) {
@@ -75,13 +89,13 @@ async function clearCustomerCurrentReservation() {
 }
 
 // Cron job for seat availability (runs every minute)
-const updateSeatAvailabilityJob = new CronJob('* * * * *', () => {
+const updateSeatAvailabilityJob = new CronJob('*/5 * * * *', () => {
   console.log('Checking seat availability...');
   updateSeatAvailability();
 });
 
 // Cron job for clearing current reservations (runs every minute)
-const clearCurrentReservationJob = new CronJob('*/5 * * * *', () => {
+const clearCurrentReservationJob = new CronJob('* * * * *', () => {
   console.log('Checking reservations to clear currentReservation...');
   clearCustomerCurrentReservation();
 });
