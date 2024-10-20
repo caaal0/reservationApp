@@ -2,34 +2,6 @@ import db from '../firebase.js';
 const CUSTOMERSREF = db.collection('customers');
 const STAFFSREF = db.collection('staffs');
 
-const users = [
-    {
-        userID: '1',
-        name: 'John Doe',
-        email: 'a@a.com',
-        contactNo: '123456789',
-        currentReservation: '3',
-        pastReservations: ['1', '2']
-    },
-    {
-        userID: '2',
-        name: 'Jane Doe',
-        email: 'b@b.com',
-        contactNo: '987654321',
-        currentReservation: '6',
-        pastReservations: ['4', '5']
-    }
-]
-
-const staffs = [
-    {
-        staffID: '1',
-        name: 'John Doe',
-        email: 'c@c.com',
-        contactNo: '123456789'
-    }
-]
-//TODO: connect to db
 const getCustomers = async (req, res) => {
     try{
         const response = await CUSTOMERSREF.get();
