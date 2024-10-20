@@ -33,7 +33,7 @@ const signup = async (req, res) => {
             displayName: name,
         });
         const newUser = {
-            userID: userRecord.uid,
+            userId: userRecord.uid,
             name: name,
             email: email,
             contactNo: '',
