@@ -69,9 +69,29 @@ const deleteStaff = async (req, res) => {
     }
 }
 
+const getCustomer = async (req, res) => {
+    try{
+        const userId = req.params.customerID;
+        
+        if(!userId) {
+            throw new Error('Invalid customerID');
+        }
+        const response = await CUSTOMERSREF.doc(userId).get();
+
+        if(!response.exists){
+            throw new Error('User not found');
+        }
+
+        res.send({ success: true, data: response.data() });
+    }catch (err){
+        res.send({ success: false, msg: 'Unable to get user', error: err.message });
+    }
+}
+
 export default{
     getCustomers,
     deleteCustomer,
     createStaff,
-    deleteStaff
+    deleteStaff,
+    getCustomer
 }

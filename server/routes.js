@@ -29,6 +29,7 @@ router.get('/seats', seats.getSeats);
 router.get('/seats/:seatNo', seats.getSeat);
 // User management
 router.get('/users', users.getCustomers);
+router.get('/users/:customerID', users.getCustomer);
 router.delete('/users/:customerID', users.deleteCustomer);
 router.post('/staffs', users.createStaff);
 router.delete('/staffs/:staffID', users.deleteStaff);
