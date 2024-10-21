@@ -71,7 +71,7 @@ async function clearCustomerCurrentReservation() {
         const user = (await userRef.get()).data();
 
         if(user.currentReservation === reservationDoc.id){
-          await userRef.update({ currentReservation: '' });
+          await userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationDoc.id) });
           // console.log(reservationData);
           // console.log(user);
           console.log(`Cleared current reservation for user ${userId} with reservationId ${reservationDoc.id}`);
@@ -95,7 +95,7 @@ const updateSeatAvailabilityJob = new CronJob('*/5 * * * *', () => {
 });
 
 // Cron job for clearing current reservations (runs every minute)
-const clearCurrentReservationJob = new CronJob('* * * * *', () => {
+const clearCurrentReservationJob = new CronJob('0 0 * * *', () => {
   console.log('Checking reservations to clear currentReservation...');
   clearCustomerCurrentReservation();
 });
