@@ -102,4 +102,40 @@ async function getMyPendingReservations(){
   }
 }
 
-export default { createReservation, getApprovedReservations, getMyPendingReservations };
+async function getMyReservations(){
+  try{
+    const authStore = useAuthStore();
+    const userId = authStore.user?.uid;
+    // Check if the user is logged in
+    if (!userId) {
+      throw new Error("User not logged in");
+    }
+    console.log(userId);
+    const response = await fetch(`http://localhost:8080/users/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const returnObj = {
+        pastReservations: data.data.pastReservations,
+        currentReservation: data.data.currentReservation,
+      }
+      return {success: true, data: returnObj};
+    } else {
+      const data = await response.json()
+      console.error('Failed to get user reservation');
+      // alert('Failed to get user reservation');
+      return data;
+    }
+  } catch (error){
+    console.error('Error:', error);
+    // alert('Error getting user reservation');
+    return error;
+  }
+}
+
+export default { createReservation, getApprovedReservations, getMyPendingReservations, getMyReservations };
