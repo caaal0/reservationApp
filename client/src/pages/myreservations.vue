@@ -9,14 +9,14 @@ const router = useRouter();
 const currentReservation = ref(null);
 const pastReservations = ref([]);
 const errorSnackbar = ref(false);
+const loading = ref(true);
 
 async function fetchReservations() {
   const response = await reservationsHelper.getMyReservations();
   if(response.success){
     pastReservations.value = response.data.pastReservations;
     currentReservation.value = response.data.currentReservation;
-    console.log(currentReservation.value);
-    console.log(pastReservations.value);
+    loading.value = false;
   }else{
     showErrorSnackbar();
   }
@@ -49,14 +49,20 @@ function formatDate(date) {
   <v-container>
     <v-row align="start">
       <v-col class="text-center">
-        <h1>My Reservations</h1>
         <v-row>
           <v-col cols="12" md="6">
             <div class="active-reservation-wrapper">
+              <h2>Current Reservation</h2>
               <v-sheet width="100%">
-                <v-card :height="currentReservation? 425:200" class="text center" hover>
-                  <v-card-title>Current Reservation</v-card-title>
-                  <v-card-text v-if="currentReservation">
+                <v-card :height="currentReservation? 325:200" class="text center" hover>
+                  <!-- <v-card-title>Current Reservation</v-card-title> -->
+                  <v-card-text v-if="loading">
+                    <v-progress-circular
+                      indeterminate
+                      color="green"
+                    ></v-progress-circular>
+                  </v-card-text>
+                  <v-card-text v-else-if="currentReservation">
                     <v-row>
                       <v-col>
                         <p class="dates">{{ formatDate(currentReservation.startTime) }}</p>
@@ -113,7 +119,7 @@ function formatDate(date) {
   </v-container>
 </template>
 
-<style>
+<style scoped>
 .active-reservation-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -137,6 +143,10 @@ function formatDate(date) {
 
 .v-card-actions .v-btn:hover {
   background-color: var(--brown-dark);
+}
+
+.v-card-text {
+  padding-block-start: 10%;
 }
 
 .seat {
@@ -167,6 +177,12 @@ div span {
 
 .pending {
   color: orange;
+  font-style: oblique;
+  text-transform: uppercase;
+}
+
+.rejected, .cancelled {
+  color: red;
   font-style: oblique;
   text-transform: uppercase;
 }
