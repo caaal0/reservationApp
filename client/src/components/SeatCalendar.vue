@@ -54,7 +54,7 @@ async function loadEvents() {
       }
     }else{
       console.log(myPendingReservations.error)
-      alert("Error loading events")
+      // alert("Error loading events")
     }
   }
 }
