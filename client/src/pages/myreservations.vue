@@ -1,13 +1,180 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import { useDisplay } from 'vuetify';
+import reservationsHelper from '../firebase/reservationsHelper.js';
+import { useRouter } from 'vue-router';
+//TODO: add view calendar to see the current reservation
+const display = useDisplay();
+const router = useRouter();
+const currentReservation = ref(null);
+const pastReservations = ref([]);
+const errorSnackbar = ref(false);
 
+async function fetchReservations() {
+  const response = await reservationsHelper.getMyReservations();
+  if(response.success){
+    pastReservations.value = response.data.pastReservations;
+    currentReservation.value = response.data.currentReservation;
+    console.log(currentReservation.value);
+    console.log(pastReservations.value);
+  }else{
+    showErrorSnackbar();
+  }
+}
+
+fetchReservations();
+
+function showErrorSnackbar(){
+  errorSnackbar.value = true;
+}
+
+function formatDate(date) {
+  const dateObj = new Date(date);
+  const localTime = new Date(dateObj.getTime() - (8 * 60 * 60 * 1000)); // subtract 8 hours for UTC-8
+
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+
+  return localTime.toLocaleString('en-US', options);
+}
 </script>
 
 <template>
-  <v-container class="fill-height">
-    <v-row justify="center">
+  <v-container>
+    <v-row align="start">
       <v-col class="text-center">
         <h1>My Reservations</h1>
+        <v-row>
+          <v-col cols="12" md="6">
+            <div class="active-reservation-wrapper">
+              <v-sheet width="100%">
+                <v-card :height="currentReservation? 425:200" class="text center" hover>
+                  <v-card-title>Current Reservation</v-card-title>
+                  <v-card-text v-if="currentReservation">
+                    <v-row>
+                      <v-col>
+                        <p class="dates">{{ formatDate(currentReservation.startTime) }}</p>
+                        <p class="dates">to</p>
+                        <p class="dates">{{ formatDate(currentReservation.endTime) }}</p>
+                      </v-col>
+                      <v-col>
+                        <p class="seat">Seat No.</p>
+                        <p><span>{{currentReservation.seatNo}}</span></p>
+                      </v-col>
+                    </v-row>
+                    <div>
+                      <span>Request Status: </span>
+                      <span :class="currentReservation.status">{{currentReservation.status}}</span>
+                    </div>
+                  </v-card-text>
+                  <v-card-text v-else>
+                    <h3>You currently have no reservation requested or approved</h3>
+                  </v-card-text>
+                  <v-card-actions class="d-flex justify-between" v-if="!currentReservation">
+                    <v-btn color="white" text @click="router.push('/')">Reserve a seat</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-sheet>
+            </div>
+          </v-col>
+          <v-col cols="12" md="6">
+            <div class="past-reservation-wrapper">
+              <v-sheet width="100%">
+                <v-card>
+                  <v-card-title>Past Reservations</v-card-title>
+                  <v-card-text>
+                    <p>Reservation Details</p>
+                  </v-card-text>
+                </v-card>
+              </v-sheet>
+            </div>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
+    <v-snackbar v-model="errorSnackbar" color="red-darken-1" timeout="3000">
+      Unable to get data currently
+      <template v-slot:actions>
+        <v-btn
+            color="white"
+            variant="text"
+            @click="visibleSnackbar = false"
+          >
+            Close
+          </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
+
+<style>
+.active-reservation-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+.past-reservation-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+.v-card-title {
+  color: var(--brown-dark);
+  font-size: 2rem !important;
+}
+.v-card-actions .v-btn {
+  background-color: var(--brown-medium);
+  width: 100%;
+}
+
+.v-card-actions .v-btn:hover {
+  background-color: var(--brown-dark);
+}
+
+.seat {
+  font-size: 1.5rem;
+  color: black;
+  font-weight: bold;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+p span {
+  color: var(--brown-medium);
+  font-size: 1.5rem;
+  font-weight: 750;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+div span {
+  font-size: 1.2rem;
+  font-weight: 750;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.approved {
+  color: var(--green-medium);
+  font-style: oblique;
+  text-transform: uppercase;
+}
+
+.pending {
+  color: orange;
+  font-style: oblique;
+  text-transform: uppercase;
+}
+
+.dates {
+  font-size: 1.2rem;
+  color: black;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+</style>
