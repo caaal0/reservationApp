@@ -53,7 +53,7 @@ const getReservation = async (req, res) => {
 		reservation.endTime = response.data().endTime.toDate();
 		reservation.createdAt = response.data().createdAt.toDate();
 
-		res.status(200).send(reservation);
+		res.status(200).send({ success: true, data: reservation });
 
 	}catch (err){
 		res.send({ success: false, msg: 'Unable to get reservation', error: err.message });
