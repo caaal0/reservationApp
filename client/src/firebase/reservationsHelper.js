@@ -102,6 +102,7 @@ async function getMyPendingReservations(){
   }
 }
 
+//uses the /users/:id endpoint to get the user's current reservation and past reservations
 async function getMyReservations(){
   try{
     const authStore = useAuthStore();
@@ -119,11 +120,28 @@ async function getMyReservations(){
     });
 
     if (response.ok) {
-      const data = await response.json();
       const returnObj = {
-        pastReservations: data.data.pastReservations,
-        currentReservation: data.data.currentReservation,
+        currentReservation: null,
+        pastReservations: []
       }
+      const data = await response.json();
+      //deal with getting the actual details of currentReservation here if there exists a current reservation
+      if(data.data.currentReservation){
+        const currentReservation = await getReservation(data.data.currentReservation);
+        if(currentReservation.success){
+          returnObj.currentReservation = currentReservation.data;
+        }
+      }
+      console.log(data.data.pastReservations);
+      //deal with getting the actual details of pastReservations here if there exists a past reservation
+      if(data.data.pastReservations.length > 0){
+        for (let i = 0; i < data.data.pastReservations.length; i++) {
+          const pastReservation = await getReservation(data.data.pastReservations[i]);
+          if(pastReservation.success){
+            returnObj.pastReservations.push(pastReservation.data);
+          }
+      }
+    }
       return {success: true, data: returnObj};
     } else {
       const data = await response.json()
@@ -138,4 +156,36 @@ async function getMyReservations(){
   }
 }
 
-export default { createReservation, getApprovedReservations, getMyPendingReservations, getMyReservations };
+async function getReservation(reservationId){
+  try{
+    const response = await fetch(`http://localhost:8080/reservations/${reservationId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Failed to retrieve reservation');
+      // alert('Reservation failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Reservation error.');
+    return {success: false, error};
+  }
+}
+
+export default {
+  createReservation,
+  getApprovedReservations,
+  getMyPendingReservations,
+  getMyReservations,
+  getReservation
+};
