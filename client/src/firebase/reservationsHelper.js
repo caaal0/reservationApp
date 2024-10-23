@@ -63,8 +63,8 @@ async function getApprovedReservations(){
       return data;
     } else {
       const data = await response.json()
-      console.error('Reservation failed');
-      alert('Reservation failed');
+      console.error('Getting approved reservations failed');
+      alert('Getting approved reservations failed');
       return data;
     }
 
