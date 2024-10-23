@@ -27,7 +27,7 @@ const deleteCustomer = async (req, res) => {
 
         const response = await CUSTOMERSREF.doc(customerID).delete();
 
-        res.send(response);
+        res.send({ success: true, msg: 'User deleted successfully', data: response });
     }catch (err){
         res.send({ success: false, msg: 'Unable to delete user', error: err.message });
     }
