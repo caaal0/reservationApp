@@ -111,7 +111,7 @@ async function getMyReservations(){
     if (!userId) {
       throw new Error("User not logged in");
     }
-    console.log(userId);
+    // console.log(userId);
     const response = await fetch(`http://localhost:8080/users/${userId}`, {
       method: 'GET',
       headers: {
@@ -132,16 +132,17 @@ async function getMyReservations(){
           returnObj.currentReservation = currentReservation.data;
         }
       }
-      console.log(data.data.pastReservations);
       //deal with getting the actual details of pastReservations here if there exists a past reservation
       if(data.data.pastReservations.length > 0){
         for (let i = 0; i < data.data.pastReservations.length; i++) {
           const pastReservation = await getReservation(data.data.pastReservations[i]);
           if(pastReservation.success){
+            // console.log(pastReservation.data);
             returnObj.pastReservations.push(pastReservation.data);
           }
+        }
       }
-    }
+      // console.log(returnObj.pastReservations);
       return {success: true, data: returnObj};
     } else {
       const data = await response.json()
