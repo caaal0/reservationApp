@@ -236,7 +236,7 @@ const getApprovedReservations = async (req, res) => {
 		const approvedSnapshots = await RESERVATIONSREF.where('status', '==', 'approved').get();
 
 		if(approvedSnapshots.empty){
-			throw new Error('No pending reservations');
+			throw new Error('No approved reservations');
 		}
 
 		let approvedArr = [];

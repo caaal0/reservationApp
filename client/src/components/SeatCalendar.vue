@@ -16,6 +16,7 @@ const visibleSnackbar = ref(false)
 //TODO: optimize with lazy loading per week
 //get the approved reservations from the database and display them on the calendar
 async function loadEvents() {
+  //TODO: fix getting events from the database
   //for approved reservations
   const approvedReservations = await reservationHelper.getApprovedReservations()
   if(approvedReservations.success){
@@ -33,8 +34,12 @@ async function loadEvents() {
       }
     }
   }else{
-    console.log(approvedReservations.error)
-    alert("Error loading events")
+    console.log(approvedReservations.error);
+    if(approvedReservations.error == "No approved reservations"){
+      console.log("No approved reservations")
+    }else{
+      alert("Error loading events")
+    }
   }
   //to get this user's pending reservations
   if(authStore.user){
@@ -128,9 +133,9 @@ function resetSteps() {
 
 async function finishReservation() {
   reservationDialog.value = false;
-  console.log("Date:", selectedDay.value)
-  console.log("Time:", selectedTime.value)
-  console.log("Option:", selectedOption.value)
+  // console.log("Date:", selectedDay.value)
+  // console.log("Time:", selectedTime.value)
+  // console.log("Option:", selectedOption.value)
   const {startTime, endTime} = calculateEndTime()
   //call firebase function to send data to the database
   const msg = await reservationHelper.createReservation(props.selectedSeat, startTime, endTime)
