@@ -16,6 +16,7 @@ async function fetchReservations() {
   if(response.success){
     pastReservations.value = response.data.pastReservations;
     currentReservation.value = response.data.currentReservation;
+    // console.log(pastReservations.value)
     loading.value = false;
   }else{
     showErrorSnackbar();
@@ -30,8 +31,8 @@ function showErrorSnackbar(){
 
 function formatDate(date) {
   const dateObj = new Date(date);
-  const localTime = new Date(dateObj.getTime() - (8 * 60 * 60 * 1000)); // subtract 8 hours for UTC-8
-
+  // const localTime = new Date(dateObj.getTime() - (8 * 60 * 60 * 1000)); // subtract 8 hours for UTC-8
+  const localTime = new Date(dateObj.getTime());
   const options = {
     year: 'numeric',
     month: 'short',
@@ -71,7 +72,7 @@ function formatDate(date) {
                       </v-col>
                       <v-col>
                         <p class="seat">Seat No.</p>
-                        <p><span>{{currentReservation.seatNo}}</span></p>
+                        <p><span class="seatno">{{currentReservation.seatNo}}</span></p>
                       </v-col>
                     </v-row>
                     <div>
@@ -91,11 +92,17 @@ function formatDate(date) {
           </v-col>
           <v-col cols="12" md="6">
             <div class="past-reservation-wrapper">
-              <v-sheet width="100%">
-                <v-card>
-                  <v-card-title>Past Reservations</v-card-title>
+              <h2 v-if="pastReservations.length > 0">Past Reservations</h2>
+              <h2 v-else>No Past Reservations</h2>
+              <v-sheet width="100%" v-for="reservation in pastReservations" :key="reservation.seatNo">
+                <v-card hover>
                   <v-card-text>
-                    <p>Reservation Details</p>
+                    <p class="d-flex">
+                      <span>Seat No {{ reservation.seatNo }}</span>
+                      <v-spacer></v-spacer>
+                      <span :class="reservation.status"> {{reservation.status}} </span>
+                    </p>
+                    <p class="dates">{{formatDate(reservation.startTime)}} - {{formatDate(reservation.endTime)}}</p>
                   </v-card-text>
                 </v-card>
               </v-sheet>
@@ -147,6 +154,7 @@ function formatDate(date) {
 
 .v-card-text {
   padding-block-start: 10%;
+  padding-block-end: 10%;
 }
 
 .seat {
@@ -156,9 +164,9 @@ function formatDate(date) {
   font-family: 'Courier New', Courier, monospace;
 }
 
-p span {
+.seatno {
   color: var(--brown-medium);
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 750;
   font-family: 'Courier New', Courier, monospace;
 }
