@@ -17,28 +17,38 @@ async function updateSeatAvailability() {
 
     seatsSnapshot.forEach(async (seatDoc) => {
       const seatData = seatDoc.data();
+      // console.log('seatData:', seatDoc.id, seatData);
       const approvedReservations = seatData.approvedReservations || [];
 
       let isSeatAvailable = true;
 
-      // Loop through the approved reservations to check if they overlap with current time
-      for (const reservationId of approvedReservations) {
-        const reservationRef = db.collection('reservations').doc(reservationId);
-        //TODO: try to use multiple conditions of where() to get the reservation that is approved and the current time is between the start and end time
-        const reservationDoc = await reservationRef.get();
-
-        if (reservationDoc.exists) {
-          const reservationData = reservationDoc.data();
-          const startTime = reservationData.startTime.toDate();
-          const endTime = reservationData.endTime.toDate();
-
-          // Check if the current time falls within the reservation's time range
-          if (currentTime >= startTime && currentTime <= endTime) {
-            isSeatAvailable = false;
-            break; // No need to continue if the seat is occupied
+      if (approvedReservations.length === 0) {
+        console.log(`No approved reservations for seat ${seatDoc.id}`);
+        // If there are no approved reservations, the seat is available
+        // await seatDoc.ref.update({ available: true });
+        // console.log(`Seat ${seatDoc.id} updated to available: true`);
+        // return;
+      }else{
+        // Loop through the approved reservations to check if they overlap with current time
+        for (const reservationId of approvedReservations) {
+          const reservationRef = db.collection('reservations').doc(reservationId);
+          //TODO: try to use multiple conditions of where() to get the reservation that is approved and the current time is between the start and end time
+          const reservationDoc = await reservationRef.get();
+  
+          if (reservationDoc.exists) {
+            const reservationData = reservationDoc.data();
+            const startTime = reservationData.startTime.toDate();
+            const endTime = reservationData.endTime.toDate();
+  
+            // Check if the current time falls within the reservation's time range
+            if (currentTime >= startTime && currentTime <= endTime) {
+              isSeatAvailable = false;
+              break; // No need to continue if the seat is occupied
+            }
           }
         }
       }
+
 
       // Update the seat's availability
       await seatDoc.ref.update({ available: isSeatAvailable });
@@ -89,7 +99,7 @@ async function clearCustomerCurrentReservation() {
 }
 
 // Cron job for seat availability (runs every minute)
-const updateSeatAvailabilityJob = new CronJob('*/5 * * * *', () => {
+const updateSeatAvailabilityJob = new CronJob('* * * * *', () => {
   console.log('Checking seat availability...');
   updateSeatAvailability();
 });
