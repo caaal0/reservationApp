@@ -13,7 +13,7 @@ const required = (value) => !!value || 'This field is required.'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 const minPasswordLength = (value) => value.length >= 6 || 'Password must be at least 6 characters long.'
 
-const emit = defineEmits(['close', 'switch-to-login'])
+const emit = defineEmits(['close', 'switch-to-login', 'signup-success'])
 
 async function signup() {
   // alert(`${name.value}, ${email.value}, ${password.value}`)
@@ -34,7 +34,7 @@ async function signup() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Signup successful:', data);
+        // console.log('Signup successful:', data);
         loading.value = false;
         // directly login after signing up
         const msg = loginHelper(email.value, password.value);
