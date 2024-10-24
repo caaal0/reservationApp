@@ -1,14 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../firebase/firebase.js'; // Import Firebase auth from your config
 import { loginHelper } from '../firebase/authHelper.js';
 
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
-const router = useRouter()
 
 const emit = defineEmits(['close', 'switch-to-signup', 'login-success'])
 
@@ -21,11 +18,12 @@ async function login(){
       emit('login-success');
     } else {
       console.error('Login failed');
-      alert('Login failed');
+      console.log(msg.error);
+      // alert('Login failed');
     }
   } catch (error) {
     console.error('Error:', error);
-    alert('Login error.');
+    // alert('Login error.');
   } finally {
     loading.value = false;
   }
