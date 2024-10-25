@@ -6,11 +6,14 @@ import { auth } from '../../firebase/firebase.js';
 import { signOut} from 'firebase/auth';
 import { useAuthStore } from '../../stores/auth.js';
 
-const authStore = useAuthStore();
-const router = useRouter();
+const authStore = useAuthStore()
+const router = useRouter()
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
+const unauthorizedSnackbar = ref(false)
+const errorSnackbar = ref(false)
+const errormsg = ref('')
 
 async function login(){
   loading.value = true;
@@ -23,14 +26,23 @@ async function login(){
         router.push('/admin');
       }else{
         console.error('Unauthorized user');
-        alert('Unauthorized user');
+        // alert('Unauthorized user');
+        unauthorizedSnackbar.value = true;
         signOut(auth);
         authStore.clearUser();
       }
       // emit('login-success');
     } else {
-      console.error('Login failed');
-      console.log(msg.error);
+      //if login failed, an error code in .msg
+      if(msg.msg == 'invalid-email'){
+        errormsg.value = 'Invalid email';
+      }else if(msg.msg == 'invalid-credential'){
+        errormsg.value = 'Invalid credential';
+      }else{
+        errormsg.value = 'Login failed';
+      }
+      errorSnackbar.value = true;
+      console.error(msg.msg);
       // alert('Login failed');
     }
   } catch (error) {
@@ -71,6 +83,12 @@ async function login(){
         </v-form>
       </v-col>
     </v-row>
+    <v-snackbar v-model="unauthorizedSnackbar" color="red">
+      Unauthorized user.
+    </v-snackbar>
+    <v-snackbar v-model="errorSnackbar" color="red">
+      {{ errormsg }}
+    </v-snackbar>
   </v-container>
 </template>
 
