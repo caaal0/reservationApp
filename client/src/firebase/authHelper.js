@@ -23,6 +23,9 @@ export async function loginHelper(email, password) {
       // setPersistence(auth, browserLocalPersistence);
       // emit('login-success');
       authStore.fetchCurrentUser();
+      // console.log('User currently logged in:', authStore.user);
+      // console.log('User role: ', authStore.userRole);
+      // console.log(data);
       return data;
     } else {
       console.error('Login failed');
@@ -31,7 +34,15 @@ export async function loginHelper(email, password) {
     }
   } catch (error) {
     console.error('Error:', error);
-    alert('Login error.');
-    return {success: false, error};
+    let msg = '';
+    if(error.code === 'auth/invalid-email'){
+      msg = 'invalid-email'
+    }else if(error.code === 'auth/invalid-credential'){
+      msg = 'invalid-credential';
+    }else{
+      msg = 'login-error';
+    }
+    // alert('Login error.');
+    return {success: false, msg, error};
   }
 };
