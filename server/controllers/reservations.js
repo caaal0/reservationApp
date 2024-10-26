@@ -11,9 +11,9 @@ const getReservations = async (req, res) => {
 
 		response.forEach(doc => {
 			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
-			let startTime = doc.data().startTime.toDate();
-			let endTime = doc.data().endTime.toDate();
-			let createdAt = doc.data().createdAt.toDate();
+			let startTime = new Date(doc.data().startTime.toDate()).toLocaleString();
+			let endTime = new Date(doc.data().endTime.toDate()).toLocaleString();
+			let createdAt = new Date(doc.data().createdAt.toDate()).toLocaleString();
 
 			reservationsArr.push(doc.data());
 
@@ -22,15 +22,16 @@ const getReservations = async (req, res) => {
 			reservationsArr[latestAdded].startTime = startTime;
 			reservationsArr[latestAdded].endTime = endTime;
 			reservationsArr[latestAdded].createdAt = createdAt;
+			reservationsArr[latestAdded].reservationId = doc.id;
 		});
 
-		res.send(reservationsArr);
+		res.send({ success: true, data: reservationsArr });
 	}catch (error){
 		res.send({ success: false, msg: 'Unable to get reservations', error: error.message });
 	}
 
 }
-//TODO: convert Firestore Timestamp to Date object before sending it to the client MIDDLEWARE
+
 const getReservation = async (req, res) => {
 
 	try{
@@ -323,7 +324,7 @@ const actionReservation = async (req, res) => {
 		}else if(action == 'rejected' || action == 'cancelled'){
 			//remove the reservation id from user's currentReservation
 			const userRef = db.collection('customers').doc(reservation.data().userId);
-			userRef.update({ currentReservation: '' });
+			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId) });
 		}
 		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
 
