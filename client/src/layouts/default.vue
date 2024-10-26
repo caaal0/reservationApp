@@ -38,6 +38,7 @@
     showLogin.value = false;
     //in the case that the user logs in from the signup form
     if(showSignup.value) showSignup.value = false;
+    // console.log('user role:', authStore.userRole);
   }
 
   function logout(){
@@ -46,7 +47,8 @@
       isLoggedIn.value = false;
       authStore.clearUser();
       // authStore.logout();
-      alert('Logout successful');
+      // alert('Logout successful');
+      router.push('/');
     } catch (error) {
       console.error('Error:', error);
       alert('Logout error.');
