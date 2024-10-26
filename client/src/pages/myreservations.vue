@@ -55,7 +55,7 @@ function formatDate(date) {
             <div class="active-reservation-wrapper">
               <h2>Current Reservation</h2>
               <v-sheet width="100%">
-                <v-card :height="currentReservation? 325:200" class="text center" hover>
+                <v-card :height="currentReservation? 325:250" class="text center" hover>
                   <!-- <v-card-title>Current Reservation</v-card-title> -->
                   <v-card-text v-if="loading">
                     <v-progress-circular
