@@ -237,11 +237,52 @@ async function getReservation(reservationId){
   }
 }
 
+async function actionReservation(reservationId, action){
+  try{
+    const authStore = useAuthStore();
+    const userId = authStore.user?.uid;
+    // Check if the user is logged in
+    if (!userId) {
+      throw new Error("User not logged in");
+    }
+
+    const newAction = {
+      reservationId: reservationId,
+      actionById: userId,
+    };
+
+    const response = await fetch(`http://localhost:8080/reservations/${action}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+      body: JSON.stringify(newAction),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Reservation action failed');
+      alert('Reservation action failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Reservation error.');
+    return {success: false, error};
+  }
+}
+
 export default {
   createReservation,
   getReservationsForTable,
   getApprovedReservations,
   getMyPendingReservations,
   getMyReservations,
-  getReservation
+  getReservation,
+  actionReservation,
 };
