@@ -64,12 +64,13 @@ const getReservation = async (req, res) => {
 const createReservation = async (req, res) => {
 
 	try{
-		const {userId, seatNo, startTime, endTime, status, actionBy, createdAt} = req.body;
+		const {userId, name, seatNo, startTime, endTime, status, actionBy, createdAt} = req.body;
 		const startTimetoDate = new Date(startTime);
 		const endTimetoDate = new Date(endTime);
 		const createdAttoDate = new Date(createdAt);
 		const newReservation = {
 			userId: userId,
+			name: name,
 			seatNo: seatNo,
 			startTime: Firestore.Timestamp.fromDate(startTimetoDate),
 			endTime: Firestore.Timestamp.fromDate(endTimetoDate),
