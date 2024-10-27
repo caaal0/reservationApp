@@ -9,7 +9,6 @@ const router = useRouter();
 const currentRoute = useRoute();
 const authStore = useAuthStore();
 authStore.fetchCurrentUser();
-console.log(currentRoute)
 const unauthorizedSnackbar = ref(false);
 
 if (!authStore.isAuthenticated() || authStore.userRole !== 'admin') {
@@ -40,7 +39,7 @@ function back() {
       >Seated
       </v-app-bar-title>
       <v-spacer></v-spacer>
-      <v-btn text v-if="authStore.userRole == 'admin'" @click="logout">
+      <v-btn text v-if="authStore.userRole == 'admin' && currentRoute.path != '/admin/login'" @click="logout">
         <v-icon>mdi-logout</v-icon>
         Logout
       </v-btn>
