@@ -140,12 +140,13 @@ async function finishReservation() {
   //call firebase function to send data to the database
   const msg = await reservationHelper.createReservation(props.selectedSeat, startTime, endTime)
   if(msg.success){
-    console.log("Reservation created successfully")
+    // console.log("Reservation created successfully")
     //create event on the calendar
     createEvent(startTime, endTime)
     resetSteps()
     showSnackbar()
   } else {
+    //TODO: error snackbar
     console.log(msg.error)
     alert("Error creating reservation")
   }
@@ -270,7 +271,7 @@ const specialHours = {
     </v-dialog>
   </v-card>
   <v-snackbar v-model="visibleSnackbar" color="green-darken-1" timeout="3000">
-    Reservation created successfully!
+    Request created successfully!
     <template v-slot:actions>
       <v-btn
           color="white"
