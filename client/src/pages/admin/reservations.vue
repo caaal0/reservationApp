@@ -37,6 +37,7 @@ const snackBarMsg = ref('');
 const snackBarSuccess = ref(true);
 const showSnackbar = ref(false);
 
+//for updating the table contents when search filters change
 async function loadItems({page, itemsPerPage, sortBy}) {
   loading.value = true;
   try {
@@ -100,6 +101,7 @@ async function actionReservation({reservationId, action}) {
   <v-container>
     <v-row>
       <v-col>
+        <h1>Reservations</h1>
         <!-- Search Filters -->
         <div class="filters">
           <v-row>
@@ -110,6 +112,8 @@ async function actionReservation({reservationId, action}) {
                 density="compact"
                 placeholder="Search name of customer..."
                 hide-details
+                maxlength="50"
+                clearable
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
@@ -119,6 +123,8 @@ async function actionReservation({reservationId, action}) {
                 density="compact"
                 placeholder="Search by status..."
                 hide-details
+                maxlength="8"
+                clearable
               ></v-text-field>
             </v-col>
           </v-row>
