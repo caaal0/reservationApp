@@ -14,6 +14,7 @@ async function createReservation(seatNumber, startTime, endTime){
 
     const newReservation = {
       userId: userId,
+      name: authStore.user.displayName,
       seatNo: seatNumber,
       startTime: startTimeISO,
       endTime: endTimeISO,
@@ -38,6 +39,59 @@ async function createReservation(seatNumber, startTime, endTime){
       const data = await response.json()
       console.error('Reservation failed');
       alert('Reservation failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Reservation error.');
+    return {success: false, error};
+  }
+}
+
+async function getReservationsForTable({page, itemsPerPage, sortBy, search}){
+  const start = (page - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  try{
+    const response = await fetch('http://localhost:8080/reservations', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const totalItems = data.data.length;
+      //filters here
+      const items = data.data.filter((item) => {
+
+        if(search.name && !item.name.toLowerCase().includes(search.name.toLowerCase())){
+          return false;
+        }
+        if(search.status && !item.status.toLowerCase().includes(search.status.toLowerCase())){
+          return false;
+        }
+        return true;
+      });
+      // Apply sorting
+      if (sortBy && sortBy.length) {
+        const { key, order } = sortBy[0];
+        items.sort((a, b) => {
+          const aValue = a[key];
+          const bValue = b[key];
+          if (aValue < bValue) return order === 'asc' ? -1 : 1;
+          if (aValue > bValue) return order === 'asc' ? 1 : -1;
+          return 0;
+        });
+      }
+      //pagination here
+      const paginated = items.slice(start, end);
+      return {success: true, data: paginated, totalItems: items.length};
+    } else {
+      const data = await response.json()
+      console.error('Getting reservations failed');
+      alert('Getting reservations failed');
       return data;
     }
 
@@ -185,6 +239,7 @@ async function getReservation(reservationId){
 
 export default {
   createReservation,
+  getReservationsForTable,
   getApprovedReservations,
   getMyPendingReservations,
   getMyReservations,
