@@ -10,7 +10,7 @@ import { onMounted, ref } from 'vue'
     </v-row>
     <!-- row of cards -->
     <v-row>
-      <v-col cols="12" md="3">
+      <v-col cols="12" md="3" sm="6">
         <v-card hover to="/admin/reservations" image="..\..\assets\vecteezy_calendar-line-icon-set-vector-calendar-schedule-symbols_6225832.svg">
           <v-card-title>Reservations</v-card-title>
           <v-card-text>
@@ -18,7 +18,7 @@ import { onMounted, ref } from 'vue'
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
+      <v-col cols="12" md="3" sm="6">
         <v-card hover to="/admin/users" image="..\..\assets\vecteezy_two-people-icon-in-trendy-flat-style-isolated-on-white_10287602.svg">
           <v-card-title>Users</v-card-title>
           <v-card-text>
@@ -26,7 +26,7 @@ import { onMounted, ref } from 'vue'
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
+      <v-col cols="12" md="3" sm="6">
         <v-card hover to="/admin/staffs" image="..\..\assets\vecteezy_three-users-icon-vector-isolated-on-a-white-background_10287619.svg">
           <v-card-title>View Staffs</v-card-title>
           <v-card-text>
@@ -34,7 +34,7 @@ import { onMounted, ref } from 'vue'
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
+      <v-col cols="12" md="3" sm="6">
         <v-card hover to="/admin/statistics" image="..\..\assets\vecteezy_speedometer-icon-in-trendy-flat-style-isolated-on-white_12049329.svg">
           <v-card-title>View Statistics</v-card-title>
           <v-card-text>
@@ -42,7 +42,7 @@ import { onMounted, ref } from 'vue'
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="12" md="3">
+      <v-col cols="12" md="3" sm="6">
         <v-card hover to="/admin/statistics" image="..\..\assets\vecteezy_simple-and-modern-style-flat-design-edit-icon-isolated-on-a_7164151.svg">
           <v-card-title>Walk-ins</v-card-title>
           <v-card-text>
