@@ -20,7 +20,7 @@ const headers = [
 
 const search = ref('');
 const loading = ref(true);
-const itemsPerPage = ref(5);
+const itemsPerPage = ref(10);
 const totalItems = ref(0);
 const serverItems = ref([]);
 
@@ -32,6 +32,10 @@ const selectedReservation = ref(null);
 const name = ref('');
 const user = ref('');
 const status = ref('');
+
+const snackBarMsg = ref('');
+const snackBarSuccess = ref(true);
+const showSnackbar = ref(false);
 
 async function loadItems({page, itemsPerPage, sortBy}) {
   loading.value = true;
@@ -69,8 +73,25 @@ function openDialog(item) {
   dialog.value = true;
 }
 
-function actionReservation({reservationId, action}) {
+async function actionReservation({reservationId, action}) {
   console.log(reservationId, action);
+  try{
+    const response = await reservationsHelper.actionReservation(reservationId, action);
+    console.log(response);
+    if(response.success){
+      dialog.value = false;
+      loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] });
+      snackBarMsg.value = `Reservation ${action} successfully.`;
+    }else{
+      console.log(response.msg);
+      snackBarMsg.value = `Reservation ${action} unsuccessfully.`;
+      snackBarSuccess.value = false;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }finally{
+    showSnackbar.value = true;
+  }
 }
 
 </script>
@@ -144,6 +165,9 @@ function actionReservation({reservationId, action}) {
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'">
+          {{ snackBarMsg }}
+        </v-snackbar>
       </v-col>
     </v-row>
   </v-container>
