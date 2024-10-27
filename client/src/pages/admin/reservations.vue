@@ -2,46 +2,148 @@
 import { onMounted, ref } from 'vue'
 import reservationsHelper from '../../firebase/reservationsHelper.js';
 
-const showPastReservations = ref(true);
-const showTodayReservations = ref(false);
-const showPendingReservations = ref(false);
+const headers = [
+  {
+    title: 'Reservation ID',
+    align: 'start',
+    sortable: false,
+    key: 'reservationId',
+  },
+  { title: 'Start', key: 'startTime', align: 'end' },
+  { title: 'End', key: 'endTime', align: 'end' },
+  { title: 'Seat Number', key: 'seatNo', align: 'end' },
+  { title: 'Created At', key: 'createdAt', align: 'end' },
+  { title: 'User', key: 'name', align: 'end' },
+  { title: 'Status', key: 'status', align: 'end' },
+  // { title: 'Action by', key: 'actionBy', align: 'end' },
+];
 
-const reservations = ref([]);
+const search = ref('');
+const loading = ref(true);
+const itemsPerPage = ref(5);
+const totalItems = ref(0);
+const serverItems = ref([]);
 
-// Fetch reservations
-const fetchReservations = async () => {
+//for dialog
+const dialog = ref(false);
+const selectedReservation = ref(null);
+
+//for search
+const name = ref('');
+const user = ref('');
+const status = ref('');
+
+async function loadItems({page, itemsPerPage, sortBy}) {
+  loading.value = true;
   try {
-    const data = await reservationsHelper.getReservations();
-    reservations.value = data.data;
+    const data = await reservationsHelper.getReservationsForTable({
+      page,
+      itemsPerPage,
+      sortBy,
+      search: {name: name.value, status: status.value},
+    });
+    serverItems.value = data.data;
+    totalItems.value = data.totalItems;
   } catch (error) {
     console.error('Error:', error);
+  } finally {
+    loading.value = false;
   }
 }
 
-onMounted(() => {
-  fetchReservations();
-  console.log('Reservations:', reservations.value);
+watch([name, status], () => {
+  search.value = String(Date.now());
 });
+
+onMounted(() => {
+  loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] });
+});
+
+function handleRowClick(event, item) {
+  openDialog(item);
+}
+
+function openDialog(item) {
+  // item.item to access the contents of the row
+  selectedReservation.value = item.item;
+  dialog.value = true;
+}
+
+function actionReservation({reservationId, action}) {
+  console.log(reservationId, action);
+}
 
 </script>
 
 <template>
   <v-container>
     <v-row>
-      <v-col class="column-container">
-        <!-- this div will contain the checkboxes filters? -->
+      <v-col>
+        <!-- Search Filters -->
         <div class="filters">
-          <v-row justify="space-between">
-            <v-checkbox color="green" v-model="showPastReservations" label="Show Past Reservations"></v-checkbox>
-            <v-checkbox color="green" v-model="showTodayReservations" label="Show Today's Reservations"></v-checkbox>
-            <v-checkbox color="green" v-model="showPendingReservations" label="Show Pending Reservations"></v-checkbox>
-            <!-- <v-col>
-            </v-col> -->
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="name"
+                class="ma-2"
+                density="compact"
+                placeholder="Search name of customer..."
+                hide-details
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="status"
+                class="ma-2"
+                density="compact"
+                placeholder="Search by status..."
+                hide-details
+              ></v-text-field>
+            </v-col>
           </v-row>
         </div>
-        <div class="reservations-wrapper">
+        <!-- Data Table -->
+        <v-data-table-server
+          v-model:items-per-page="itemsPerPage"
+          :headers="headers"
+          :items="serverItems"
+          :items-length="totalItems"
+          :loading="loading"
+          :search="search"
+          item-value="reservationId"
+          :hover="true"
+          @update:options="loadItems"
+          @click:row="handleRowClick"
+        ></v-data-table-server>
 
-        </div>
+        <!-- Reservation Details Dialog -->
+        <v-dialog v-model="dialog" max-width="600px">
+          <v-card>
+            <v-card-title>Reservation Details</v-card-title>
+            <v-card-text>
+              <div v-if="selectedReservation">
+                <p><strong>Reservation ID:</strong> {{ selectedReservation.reservationId }}</p>
+                <p><strong>Start Time:</strong> {{ selectedReservation.startTime }}</p>
+                <p><strong>End Time:</strong> {{ selectedReservation.endTime }}</p>
+                <p><strong>Seat Number:</strong> {{ selectedReservation.seatNo }}</p>
+                <p><strong>User:</strong> {{ selectedReservation.name }}</p>
+                <p><strong>Status:</strong> {{ selectedReservation.status }}</p>
+                <p><strong>Action by:</strong> {{ selectedReservation.actionBy }}</p>
+              </div>
+              <div v-else>
+                <p>No reservation selected.</p>
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <div class="actionButtons" v-if="selectedReservation.status == 'pending'">
+                <v-btn color="green" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'approved'})">Approve</v-btn>
+                <v-btn color="red" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'rejected'})">Reject</v-btn>
+              </div>
+              <v-btn class="closeBtn" @click="dialog = false">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
   </v-container>
@@ -51,30 +153,9 @@ onMounted(() => {
 .filters {
   margin-top: 1rem;
   margin-bottom: 1rem;
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto; /* Enables horizontal scrolling */
 }
 
-.reservations-wrapper {
-  display: flex;
-  flex-direction: column;
-  scroll-behavior: smooth;
-  scrollbar-gutter: stable; /* Adds stable spacing for scrollbar */
-  gap: 1rem;
-  overflow-y: auto; /* Enables vertical scrolling */
-  max-height: 500px; /* Adjust based on your layout needs */
-}
-
-/* Optional: Hide default scrollbar and style */
-.filters::-webkit-scrollbar,
-.reservations-wrapper::-webkit-scrollbar {
-  display: none; /* Hide default scrollbar */
-}
-
-.filters,
-.reservations-wrapper {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+.closeBtn {
+  color: var(--brown-dark);
 }
 </style>
