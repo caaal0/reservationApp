@@ -66,12 +66,14 @@ async function signup() {
           label="Email"
           required
           :rules="[required, validEmail]"
+          maxlength="64"
           ></v-text-field>
           <v-text-field
           v-model="password"
           label="Password"
           required
           type="password"
+          maxlength="32"
           :rules="[required, minPasswordLength]"
           ></v-text-field>
           <v-text-field
@@ -79,6 +81,7 @@ async function signup() {
             label="Name"
             required
             :rules="[required]"
+            maxlength="50"
           ></v-text-field>
           <v-btn
             color="green"

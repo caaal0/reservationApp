@@ -43,12 +43,14 @@ async function login(){
             v-model="email"
             label="Email"
             required
+            maxlength="64"
           ></v-text-field>
           <v-text-field
             v-model="password"
             label="Password"
             required
             type="password"
+            maxlength="32"
           ></v-text-field>
           <v-btn
             @click="login(email.valueOf(), password.valueOf())"
