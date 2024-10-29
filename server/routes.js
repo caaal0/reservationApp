@@ -31,6 +31,7 @@ router.get('/seats/:seatNo', seats.getSeat);
 router.get('/users', users.getCustomers);
 router.get('/users/:customerID', users.getCustomer);
 router.delete('/users/:customerID', users.deleteCustomer);
+router.get('/staffs', users.getStaffs);
 router.post('/staffs', users.createStaff);
 router.delete('/staffs/:staffID', users.deleteStaff);
 
