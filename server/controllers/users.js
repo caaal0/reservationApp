@@ -1,4 +1,5 @@
 import db from '../firebase.js';
+import admin from 'firebase-admin';
 const CUSTOMERSREF = db.collection('customers');
 const STAFFSREF = db.collection('staffs');
 
@@ -11,7 +12,7 @@ const getCustomers = async (req, res) => {
             usersArr.push(doc.data());
         });
 
-        res.send(usersArr);
+        res.send({ success: true, data: usersArr });
     }catch (err){
         res.send({ success: false, msg: 'Unable to get users', error: err.message });
     }
@@ -24,6 +25,7 @@ const deleteCustomer = async (req, res) => {
         if(!customerID) {
             throw new Error('Invalid customerID');
         }
+        await admin.auth().deleteUser(customerID);
 
         const response = await CUSTOMERSREF.doc(customerID).delete();
 
