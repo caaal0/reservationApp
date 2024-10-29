@@ -79,7 +79,95 @@ async function deleteUser(userId){
   }
 }
 
+async function createStaff({name, email, contactNo, password}){
+  try{
+    const staffDetails = {
+      name: name,
+      email: email,
+      contactNo: contactNo,
+      password: password
+    }
+    const response = await fetch('http://localhost:8080/staffs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(staffDetails)
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Creating staff failed');
+      alert('Creating staff failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Staff creation error.');
+    return {success: false, error};
+  }
+}
+
+async function getStaffs(){
+  try{
+    const response = await fetch('http://localhost:8080/staffs', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Getting staffs failed');
+      alert('Getting staffs failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Staff retrieval error.');
+    return {success: false, error};
+  }
+}
+
+async function deleteStaff(staffId){
+  try{
+    const response = await fetch(`http://localhost:8080/staffs/${staffId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Deleting staff failed');
+      alert('Deleting staff failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Staff deletion error.');
+    return {success: false, error};
+  }
+}
+
 export default {
   getUsersForTable,
   deleteUser,
+  createStaff,
+  getStaffs,
+  deleteStaff,
 }
