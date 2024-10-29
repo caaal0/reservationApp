@@ -17,6 +17,7 @@ export const useAuthStore = defineStore('auth', {
         if (userDoc.exists()) {
           this.userRole = 'customer';
         }else{
+          // console.log('not a customer, checking staff collection with uid: ', this.user.uid);
           const staffDoc = await getDoc(doc(db, 'staffs', this.user.uid));
           if (staffDoc.exists()) {
             this.userRole = 'staff';
@@ -30,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;  // Clear the user on sign-out
       this.userRole = null; // Clear the user role on sign-out
     },
-    fetchCurrentUser() {
+     fetchCurrentUser() {
       // Listen to auth state changes and set the user in the store
       onAuthStateChanged(auth, (user) => {
         if (user) {

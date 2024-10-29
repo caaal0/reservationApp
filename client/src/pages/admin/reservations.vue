@@ -75,10 +75,10 @@ function openDialog(item) {
 }
 
 async function actionReservation({reservationId, action}) {
-  console.log(reservationId, action);
+  // console.log(reservationId, action);
   try{
     const response = await reservationsHelper.actionReservation(reservationId, action);
-    console.log(response);
+    // console.log(response);
     if(response.success){
       dialog.value = false;
       loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] });

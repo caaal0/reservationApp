@@ -71,5 +71,4 @@ export default {
     verifyUserToken,
     signup,
     login
-    // Other functions...
 };

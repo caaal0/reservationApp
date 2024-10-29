@@ -23,9 +23,6 @@ const formRef = ref(null)
 async function addStaff(){
   if (await validateForm()) {
     loading.value = true
-    console.log(name.value)
-    console.log(email.value)
-    console.log(contactNo.value)
     try{
       const response = await usersHelper.createStaff({
         name: name.value,
@@ -99,7 +96,6 @@ onMounted(async () => {
 })
 
 async function deleteStaff(staffId){
-  console.log('Delete staff:', staffId)
   try{
     const response = await usersHelper.deleteStaff(staffId)
     if(response.success){

@@ -27,7 +27,7 @@ async function updateSeatAvailability() {
         // If there are no approved reservations, the seat is available
         // await seatDoc.ref.update({ available: true });
         // console.log(`Seat ${seatDoc.id} updated to available: true`);
-        // return;
+        return;
       }else{
         // Loop through the approved reservations to check if they overlap with current time
         for (const reservationId of approvedReservations) {
