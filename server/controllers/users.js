@@ -38,17 +38,22 @@ const deleteCustomer = async (req, res) => {
 const createStaff = async (req, res) => {
 
     try{
-        const { staffID, name, email, contactNo } = req.body;
+        const {name, email, contactNo, password } = req.body;
+        const staffRecord = await admin.auth().createUser({
+            email,
+            password,
+            displayName: name,
+        });
         const newStaff = {
-            staffID: staffID,
+            staffId: staffRecord.uid,
             name: name,
             email: email,
             contactNo: contactNo
         }
 
-        console.log(newStaff);
-        const response = await STAFFSREF.add(newStaff);
-        res.status(201).send(response);
+        // console.log(newStaff);
+        const response = await STAFFSREF.doc(staffRecord.uid).set(newStaff);
+        res.status(201).send({ success: true, staff: newStaff });
     }catch (err) {
         res.send({ success: false, msg: 'Unable to create staff', error: err.message });
     }   
@@ -62,10 +67,10 @@ const deleteStaff = async (req, res) => {
         if(!staffID) {
             throw new Error('Invalid staffID');
         }
-
+        await admin.auth().deleteUser(staffID);
         const response = await STAFFSREF.doc(staffID).delete();
 
-        res.send(response);
+        res.send({ success: true, msg: 'Staff deleted successfully', data: response });
     }catch (err){
         res.send({ success: false, msg: 'Unable to delete staff', error: err.message });
     }
@@ -90,10 +95,26 @@ const getCustomer = async (req, res) => {
     }
 }
 
+const getStaffs = async (req, res) => {
+    try{
+        const response = await STAFFSREF.get();
+        let staffArr = [];
+
+        response.forEach(doc => {
+            staffArr.push(doc.data());
+        });
+
+        res.send({ success: true, data: staffArr });
+    }catch (err){
+        res.send({ success: false, msg: 'Unable to get staffs', error: err.message });
+    }
+}
+
 export default{
     getCustomers,
     deleteCustomer,
     createStaff,
     deleteStaff,
-    getCustomer
+    getCustomer,
+    getStaffs,
 }
