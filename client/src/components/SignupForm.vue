@@ -9,6 +9,12 @@ const password = ref('')
 const loading = ref(false)
 const router = useRouter()
 
+const formRef = ref(null)
+
+const showSnackbar = ref(false)
+const snackBarSuccess = ref(true)
+const snackBarMsg = ref('')
+
 const required = (value) => !!value || 'This field is required.'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 const minPasswordLength = (value) => value.length >= 6 || 'Password must be at least 6 characters long.'
@@ -17,6 +23,13 @@ const emit = defineEmits(['close', 'switch-to-login', 'signup-success'])
 
 async function signup() {
   // alert(`${name.value}, ${email.value}, ${password.value}`)
+  if(await validateForm()){
+  }else{
+    snackBarMsg.value = 'Please fill out the form correctly.'
+    snackBarSuccess.value = false
+    showSnackbar.value = true
+    return
+  }
   loading.value = true;
   try {
       const response = await fetch('http://localhost:8080/signup', {
@@ -50,6 +63,17 @@ async function signup() {
     }
 }
 
+async function validateForm() {
+  const validity = ref(null);
+  if (formRef.value) {
+    validity.value = await formRef.value.validate()
+  }else{
+    return false
+  }
+  console.log(validity.value)
+  return validity.value.valid
+}
+
 </script>
 
 <template>
@@ -60,7 +84,7 @@ async function signup() {
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <h1>Signup</h1>
-        <v-form>
+        <v-form ref="formRef">
           <v-text-field
           v-model="email"
           label="Email"
@@ -104,6 +128,11 @@ async function signup() {
             >
               Login
             </v-btn>
+            <v-snackbar
+              v-model="showSnackbar"
+              :color="snackBarSuccess? 'green':'red'"
+            >{{ snackBarMsg }}
+            </v-snackbar>
           </v-col>
         </v-row>
       </v-col>
