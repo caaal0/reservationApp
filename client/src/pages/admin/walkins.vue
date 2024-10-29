@@ -1,9 +1,9 @@
 <script setup>
-
+import WalkIn from '@/components/WalkIn.vue'
 </script>
 
 <template>
-  <h1>Walk-ins</h1>
+  <WalkIn />
 </template>
 
 <style scoped>
