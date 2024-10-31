@@ -1,18 +1,48 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
+import usersHelper from '../firebase/usersHelper'
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore()
 const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
+const customers = ref([])
 // User choices
 const selectedDay = ref(null)
 const selectedTime = ref(null)
 const selectedOption = ref(null)
-const visibleSnackbar = ref(false)
+
+const snackBarMsg = ref('');
+const snackBarSuccess = ref(true);
+const showSnackbar = ref(false);
+//for admin to book for a customer
+const customerSelected = ref(null)
+
+async function loadCustomers(){
+  try{
+    const response = await usersHelper.getCustomers()
+    if(response.success){
+      customers.value = response.data
+    }else{
+      console.log(response.error)
+      // alert("Error loading customers")
+      snackBarMsg.value = "Error loading customers"
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+    }
+  }catch(error){
+    // console.log(error)
+    // alert("Error loading customers")
+    console.error(error)
+    snackBarMsg.value = "Error loading customers"
+    snackBarSuccess.value = false
+    showSnackbar.value = true
+  }
+}
+
 //TODO: optimize with lazy loading per week
 //get the approved reservations from the database and display them on the calendar
 async function loadEvents() {
@@ -63,7 +93,7 @@ async function loadEvents() {
     }
   }
 }
-loadEvents()
+// loadEvents()
 
 const emit = defineEmits(['close'])
 
@@ -71,18 +101,19 @@ const props = defineProps({
   selectedSeat: String,
 })
 
-function showSnackbar() {
-  visibleSnackbar.value = true
-}
 
 function openReservationDialog() {
   if(!authStore.user){
-    alert("Please login to make a reservation")
+    // alert("Please login to make a reservation")
+    snackBarMsg.value = "Please login to make a reservation"
+    snackBarSuccess.value = false
+    showSnackbar.value = true
     return
   }
   reservationDialog.value = true;
 }
 
+//function to handle cell click on date-picker
 function onCellClick(event) {
   // alert(event)
   const clickedDate = new Date(event);
@@ -132,30 +163,53 @@ function resetSteps() {
 }
 
 async function finishReservation() {
-  reservationDialog.value = false;
   // console.log("Date:", selectedDay.value)
   // console.log("Time:", selectedTime.value)
   // console.log("Option:", selectedOption.value)
   const {startTime, endTime} = calculateEndTime()
   //call firebase function to send data to the database
-  const msg = await reservationHelper.createReservation(props.selectedSeat, startTime, endTime)
+  let temp_msg = null
+  let msg = null
+  if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
+    //also send the customer object, and the admin or staff id with
+    const adminStaffId=authStore.user?.uid
+    const customerObj = customers.value.find(customer => customer.userId === customerSelected.value)
+    //this will receive the reservation obj
+    temp_msg = await reservationHelper.createReservation(props.selectedSeat, startTime, endTime, customerObj, adminStaffId)
+    msg = await reservationHelper.actionReservation(temp_msg.data.reservationId, 'approved', adminStaffId)
+  }else{
+    msg = await reservationHelper.createReservation(props.selectedSeat, startTime, endTime)
+  }
   if(msg.success){
     // console.log("Reservation created successfully")
     //create event on the calendar
     createEvent(startTime, endTime)
     resetSteps()
-    showSnackbar()
+    snackBarMsg.value = "Reservation created successfully"
+    snackBarSuccess.value = true
   } else {
     //TODO: error snackbar
     console.log(msg.error)
-    alert("Error creating reservation")
+    // alert("Error creating reservation")
+    snackBarMsg.value = "Error creating reservation"
+    snackBarSuccess.value = false
   }
+  showSnackbar.value = true
+  reservationDialog.value = false;
 }
 
 const minDate = computed(() => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return today;
+})
+
+const canFinishReservation = computed(() => {
+  if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
+    return selectedDay.value && selectedTime.value && selectedOption.value && customerSelected.value
+  }else{
+    return selectedDay.value && selectedTime.value && selectedOption.value
+  }
 })
 
 const events = ref([])
@@ -168,6 +222,17 @@ const specialHours = {
   //   label: 'Closed'
   // },
 }
+
+onMounted(async () => {
+  // console.log('Mounted')
+  loadEvents()
+  if(authStore.userRole === 'admin'){
+    // console.log('Admin')
+    // console.log(customers)
+    await loadCustomers()
+    customers.value = customers.value.filter(customer => customer.currentReservation === '')
+  }
+})
 
 </script>
 <template>
@@ -262,24 +327,39 @@ const specialHours = {
           <v-radio label="3 Hours" value="3"></v-radio>
           <v-radio label="5 Hours" value="5"></v-radio>
         </v-radio-group>
+        <!-- if admin, add option to book for a customer -->
+        <v-autocomplete
+          v-if="authStore.user && authStore.userRole === 'admin'"
+          v-model="customerSelected"
+          :items="customers"
+          item-title="name"
+          item-value="userId"
+          label="Book for customer"
+          dense
+          hide-details
+          clearable
+          variant="outlined"
+          auto-select-first="true"
+        >
+        </v-autocomplete>
       </v-card-text>
       <v-card-actions class="d-flex justify-between">
         <v-btn text @click="prevStep">Back</v-btn>
-        <v-btn text @click="finishReservation" :disabled="!selectedOption">Finish</v-btn>
+        <v-btn text @click="finishReservation" :disabled="!canFinishReservation">Finish</v-btn>
       </v-card-actions>
     </v-card>
     </v-dialog>
   </v-card>
-  <v-snackbar v-model="visibleSnackbar" color="green-darken-1" timeout="3000">
-    Request created successfully!
+  <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'" timeout="3000">
+    {{ snackBarMsg }}
     <template v-slot:actions>
       <v-btn
-          color="white"
-          variant="text"
-          @click="visibleSnackbar = false"
-        >
-          Close
-        </v-btn>
+        color="white"
+        variant="text"
+        @click="showSnackbar = false"
+      >
+        Close
+      </v-btn>
     </template>
   </v-snackbar>
 </template>
