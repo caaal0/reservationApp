@@ -87,6 +87,7 @@ const createReservation = async (req, res) => {
 		//add the reservation id as the currentReservation of the user
 		const userRef = db.collection('customers').doc(userId);
 		userRef.update({ currentReservation: response.id });
+		newReservation.reservationId = response.id;
 		res.status(201).send({ success: true, msg: 'Reservation created', data: newReservation });
 
 	}catch (err){
