@@ -1,25 +1,29 @@
 import { useAuthStore } from '@/stores/auth';
-
-async function createReservation(seatNumber, startTime, endTime){
+const authStore = useAuthStore();
+//bookForCustomer will contain the admin or staff id if the reservation is being made for a customer
+async function createReservation(seatNumber, startTime, endTime, userId=null, bookForCustomer=null){
   try{
-    const authStore = useAuthStore();
-    const userId = authStore.user?.uid;
+    // const userId = authStore.user?.uid;
     // Check if the user is logged in
+    if(bookForCustomer === null){
+      userId = authStore.user?.uid;
+    }
     if (!userId) {
       throw new Error("User not logged in");
     }
 
     const startTimeISO = new Date(startTime).toISOString();
     const endTimeISO = new Date(endTime).toISOString();
-
+    //TODO: check if the seat is available
+    //TODO: if bookForCustomer find way to use actionReservation to approve or create new endpoint
     const newReservation = {
-      userId: userId,
-      name: authStore.user.displayName,
+      userId: bookForCustomer? userId.userId: userId,
+      name: bookForCustomer? userId.name: authStore.user.displayName,
       seatNo: seatNumber,
       startTime: startTimeISO,
       endTime: endTimeISO,
       status: 'pending',
-      actionBy: '',
+      actionBy: bookForCustomer? bookForCustomer: '',
       createdAt: new Date().toISOString(),
     };
 
@@ -131,7 +135,7 @@ async function getApprovedReservations(){
 
 async function getMyPendingReservations(){
   try{
-    const authStore = useAuthStore();
+    // const authStore = useAuthStore();
     const userId = authStore.user?.uid;
     const response = await fetch(`http://localhost:8080/reservations/pending/${userId}`, {
       method: 'GET',
@@ -159,7 +163,7 @@ async function getMyPendingReservations(){
 //uses the /users/:id endpoint to get the user's current reservation and past reservations
 async function getMyReservations(){
   try{
-    const authStore = useAuthStore();
+    // const authStore = useAuthStore();
     const userId = authStore.user?.uid;
     // Check if the user is logged in
     if (!userId) {
@@ -237,10 +241,15 @@ async function getReservation(reservationId){
   }
 }
 
-async function actionReservation(reservationId, action){
+async function actionReservation(reservationId, action, adminStaffId=null){
   try{
-    const authStore = useAuthStore();
-    const userId = authStore.user?.uid;
+    // const authStore = useAuthStore();
+    let userId;
+    if(adminStaffId === null){
+      userId = authStore.user?.uid;
+    }else{
+      userId = adminStaffId;
+    }
     // Check if the user is logged in
     if (!userId) {
       throw new Error("User not logged in");
