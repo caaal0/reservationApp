@@ -1,6 +1,32 @@
 
 
-async function getUsersForTable({page, itemsPerPage, sortBy, search}){
+async function getCustomers(){
+  try{
+    const response = await fetch('http://localhost:8080/users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Getting users failed');
+      alert('Getting users failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Users retrieval error.');
+    return {success: false, error};
+  }
+}
+
+async function getCustomersForTable({page, itemsPerPage, sortBy, search}){
   const start = (page - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   try{
@@ -165,7 +191,8 @@ async function deleteStaff(staffId){
 }
 
 export default {
-  getUsersForTable,
+  getCustomers,
+  getCustomersForTable,
   deleteUser,
   createStaff,
   getStaffs,
