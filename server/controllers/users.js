@@ -3,6 +3,42 @@ import admin from 'firebase-admin';
 const CUSTOMERSREF = db.collection('customers');
 const STAFFSREF = db.collection('staffs');
 
+//this is for creating a doc for users who signed in with google
+const createCustomerDoc = async (req, res) => {
+    const { customerID } = req.params;
+    const { userRecord } = req.body;
+
+    try{
+        const userDoc = await CUSTOMERSREF.doc(customerID).get();
+
+        if(userDoc.exists){
+            throw new Error('User already exists in the collection');
+        }
+
+        if(!customerID) {
+            throw new Error('Invalid customerID');
+        }
+
+        if(!userRecord) {
+            throw new Error('Invalid userRecord');
+        }
+        // const userRecord = await admin.auth().getUser(customerID);
+        const newUser = {
+            userId: userRecord.uid,
+            name: userRecord.displayName,
+            email: userRecord.email,
+            contactNo: '',
+            currentReservation: '',
+            pastReservations: [],
+        };
+        const response = await CUSTOMERSREF.doc(userRecord.uid).set(newUser);
+
+        res.status(201).send({ success: true, user: newUser });
+    }catch (err){
+        res.send({ success: false, msg: 'Unable to create user doc', error: err.message });
+    }
+}
+
 const getCustomers = async (req, res) => {
     try{
         const response = await CUSTOMERSREF.get();
@@ -111,6 +147,7 @@ const getStaffs = async (req, res) => {
 }
 
 export default{
+    createCustomerDoc,
     getCustomers,
     deleteCustomer,
     createStaff,
