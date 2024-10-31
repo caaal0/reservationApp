@@ -58,11 +58,17 @@ async function login(){
             style="margin-bottom: 20px;"
             type="button"
             :loading="loading"
+            width="100%"
+            rounded="false"
           >
             Login
           </v-btn>
 
         </v-form>
+        <div class="or-divider">
+          <span>or continue with</span>
+        </div>
+        <Google @success="emit('login-success')"/>
         <v-row align="end" justify="center">
           <v-col class="text-center">
             <span>Don't have an account?</span>
@@ -103,5 +109,22 @@ h1 {
 }
 .close-btn .v-icon:hover {
   color: var(--brown-dark);
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  margin: 16px 0;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #ddd;
+  margin: 0 8px;
 }
 </style>

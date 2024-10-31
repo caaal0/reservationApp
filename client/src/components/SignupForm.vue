@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { loginHelper } from '../firebase/authHelper.js'
+import Google from './Google.vue'
 
 const name = ref('')
 const email = ref('')
@@ -70,7 +71,7 @@ async function validateForm() {
   }else{
     return false
   }
-  console.log(validity.value)
+  // console.log(validity.value)
   return validity.value.valid
 }
 
@@ -111,13 +112,19 @@ async function validateForm() {
             color="green"
             style="margin-bottom: 20px;"
             type="button"
+            width="100%"
             :loading="loading"
             @click="signup"
+            rounded="false"
           >
             Signup
           </v-btn>
 
         </v-form>
+        <div class="or-divider">
+          <span>or continue with</span>
+        </div>
+        <Google @success="emit('signup-success')"/>
         <v-row align="end" justify="center">
           <v-col class="text-center">
             <span>Already have an account?</span>
@@ -165,6 +172,23 @@ h1 {
 }
 .close-btn .v-icon:hover {
   color: var(--brown-dark);
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: grey;
+  margin: 16px 0;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #ddd;
+  margin: 0 8px;
 }
 
 </style>
