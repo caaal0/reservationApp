@@ -55,9 +55,10 @@ router.beforeEach(async (to, from, next) => {
   // Check if the route requires authentication
   if (to.meta.requiresAuth) {
     if (!user) {
-      // Avoid redirecting to login if already on the login page
-      if (to.path !== '/admin/login') {
-        return next('/admin/login'); // Redirect to login if not authenticated
+      // Dynamically redirect to the correct login page based on the route's path
+      const loginPath = to.path.startsWith('/admin') ? '/admin/login' : '/staff/login';
+      if (to.path !== loginPath) {
+        return next(loginPath); // Redirect to the appropriate login if not authenticated
       } else {
         return next(); // Continue if already on the login page
       }
@@ -68,9 +69,10 @@ router.beforeEach(async (to, from, next) => {
     // If the route requires a specific role and the user doesn't match, redirect
     if (to.meta.role && to.meta.role !== userRole) {
       alert('Unauthorized access');
-      return next('/admin/login'); // Redirect unauthorized users
-    }else{
-      return next(); // Proceed if the user is authenticated
+      const unauthorizedPath = to.path.startsWith('/admin') ? '/admin/login' : '/staff/login';
+      return next(unauthorizedPath); // Redirect unauthorized users
+    } else {
+      return next(); // Proceed if the user is authenticated and authorized
     }
   }
 
