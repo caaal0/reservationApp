@@ -304,7 +304,7 @@ const getMyCurrentReservation = async (req, res) => {
 const actionReservation = async (req, res) => {
 	
 	const { action } = req.params;
-	const { reservationId, actionById } = req.body;
+	const { reservationId, actionById, actionByName } = req.body;
 	try{
 		const validActions = ['approved', 'rejected', 'cancelled'];
 		const reservation = await db.collection('reservations').doc(reservationId).get();
@@ -317,7 +317,7 @@ const actionReservation = async (req, res) => {
 			throw new Error('Invalid action');
 		}
 		
-		reservation.ref.update({ status: action, actionBy: actionById });
+		reservation.ref.update({ status: action, actionBy: actionByName, actionById: actionById });
 		
 		if(action == 'approved') {
 			//add the reservation id to the seat

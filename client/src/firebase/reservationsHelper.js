@@ -73,7 +73,7 @@ async function getReservationsForTable({page, itemsPerPage, sortBy, search}){
         if(search.name && !item.name.toLowerCase().includes(search.name.toLowerCase())){
           return false;
         }
-        if(search.status && !item.status.toLowerCase().includes(search.status.toLowerCase())){
+        if(search.status && !item.status.includes(search.status)){
           return false;
         }
         return true;
@@ -258,6 +258,7 @@ async function actionReservation(reservationId, action, adminStaffId=null){
     const newAction = {
       reservationId: reservationId,
       actionById: userId,
+      actionByName: authStore.user.displayName,
     };
 
     const response = await fetch(`http://localhost:8080/reservations/${action}`, {
