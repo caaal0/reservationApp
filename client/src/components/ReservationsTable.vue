@@ -31,7 +31,7 @@ const selectedReservation = ref(null);
 //for search
 const name = ref('');
 const user = ref('');
-const status = ref('');
+const status = ref([]);
 
 const snackBarMsg = ref('');
 const snackBarSuccess = ref(true);
@@ -117,15 +117,16 @@ async function actionReservation({reservationId, action}) {
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
-              <v-text-field
+              <v-chip-group
                 v-model="status"
-                class="ma-2"
-                density="compact"
-                placeholder="Search by status..."
-                hide-details
-                maxlength="8"
-                clearable
-              ></v-text-field>
+                active-class="selected-chip"
+                color="green-darken-1"
+              >
+                <v-chip value="approved" text="Approved" variant="outlined" filter></v-chip>
+                <v-chip value="rejected" text="Rejected" variant="outlined" filter></v-chip>
+                <v-chip value="pending" text="Pending" variant="outlined" filter></v-chip>
+                <v-chip value="cancelled" text="Cancelled" variant="outlined" filter></v-chip>
+              </v-chip-group>
             </v-col>
           </v-row>
         </div>
@@ -167,7 +168,7 @@ async function actionReservation({reservationId, action}) {
                 <v-btn color="green" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'approved'})">Approve</v-btn>
                 <v-btn color="red" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'rejected'})">Reject</v-btn>
               </div>
-              <v-btn class="closeBtn" @click="dialog = false">Close</v-btn>
+              <v-btn color="#3a5335" @click="dialog = false">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -185,7 +186,8 @@ async function actionReservation({reservationId, action}) {
   margin-bottom: 1rem;
 }
 
-.closeBtn {
-  color: var(--brown-dark);
+h1 {
+  margin-bottom: 20px;
+  color: var(--green-dark);
 }
 </style>
