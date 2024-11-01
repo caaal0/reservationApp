@@ -11,6 +11,7 @@ const authStore = useAuthStore()
 const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
 const customers = ref([])
+const finalizeReservation = ref(false)  // Dialog to confirm reservation details
 // User choices
 const selectedDay = ref(null)
 const selectedTime = ref(null)
@@ -229,7 +230,7 @@ const specialHours = {
 onMounted(async () => {
   // console.log('Mounted')
   loadEvents()
-  if(authStore.userRole === 'admin'){
+  if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
     // console.log('Admin')
     // console.log(customers)
     await loadCustomers()
@@ -296,8 +297,8 @@ onMounted(async () => {
           </div>
         </v-card-text>
         <v-card-actions>
-          <v-btn text @click="reservationDialog = false">Cancel</v-btn>
-          <v-btn text @click="nextStep" :disabled="!selectedDay">Next</v-btn>
+          <v-btn text color="error" @click="reservationDialog = false">Cancel</v-btn>
+          <v-btn text color="#6b8d71" @click="nextStep" :disabled="!selectedDay">Next</v-btn>
         </v-card-actions>
       </v-card>
       <!-- Step 2: Pick a Time -->
@@ -310,13 +311,13 @@ onMounted(async () => {
           full-width
           height="500"
           width="350"
-          color="green-lighten-1x"
+          color="#6b8d71"
           format="24hr"
         />
       </v-card-text>
       <v-card-actions class="d-flex justify-between">
-        <v-btn text @click="prevStep">Back</v-btn>
-        <v-btn text @click="nextStep" :disabled="!selectedTime">Next</v-btn>
+        <v-btn text color="#6b8d71" @click="prevStep">Back</v-btn>
+        <v-btn text color="#6b8d71" @click="nextStep" :disabled="!selectedTime">Next</v-btn>
       </v-card-actions>
     </v-card>
 
@@ -332,7 +333,7 @@ onMounted(async () => {
         </v-radio-group>
         <!-- if admin, add option to book for a customer -->
         <v-autocomplete
-          v-if="authStore.user && authStore.userRole === 'admin'"
+          v-if="authStore.user && (authStore.userRole === 'admin' || authStore.userRole === 'staff')"
           v-model="customerSelected"
           :items="customers"
           item-title="name"
@@ -347,11 +348,27 @@ onMounted(async () => {
         </v-autocomplete>
       </v-card-text>
       <v-card-actions class="d-flex justify-between">
-        <v-btn text @click="prevStep">Back</v-btn>
-        <v-btn text @click="finishReservation" :disabled="!canFinishReservation">Finish</v-btn>
+        <v-btn text color="#6b8d71" @click="prevStep">Back</v-btn>
+        <v-btn text color="#6b8d71" @click="finalizeReservation = true" :disabled="!canFinishReservation">Finish</v-btn>
       </v-card-actions>
       <!-- make another dialog to confirm the details TODO:  -->
     </v-card>
+    <v-dialog v-model="finalizeReservation" persistent max-width="300">
+      <v-card>
+        <v-card-title>Confirm Reservation</v-card-title>
+        <v-card-text>
+          <p><strong>Confirm the following details:</strong></p>
+          <p>Seat: {{selectedSeat}}</p>
+          <p>Day: {{selectedDay}}</p>
+          <p>Time: {{selectedTime}}</p>
+          <p>Duration: {{selectedOption}} hours</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn text color="error" @click="finalizeReservation = false">Cancel</v-btn>
+          <v-btn text color="#6b8d71" @click="finishReservation">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     </v-dialog>
   </v-card>
   <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'" timeout="3000">
