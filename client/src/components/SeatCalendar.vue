@@ -4,6 +4,7 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
 import usersHelper from '../firebase/usersHelper'
+import analyticsHelper from '@/firebase/analyticsHelper'
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore()
@@ -184,9 +185,11 @@ async function finishReservation() {
     // console.log("Reservation created successfully")
     //create event on the calendar
     createEvent(startTime, endTime)
-    resetSteps()
     snackBarMsg.value = "Reservation created successfully"
     snackBarSuccess.value = true
+
+    analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
+    resetSteps()
   } else {
     //TODO: error snackbar
     console.log(msg.error)
@@ -347,6 +350,7 @@ onMounted(async () => {
         <v-btn text @click="prevStep">Back</v-btn>
         <v-btn text @click="finishReservation" :disabled="!canFinishReservation">Finish</v-btn>
       </v-card-actions>
+      <!-- make another dialog to confirm the details TODO:  -->
     </v-card>
     </v-dialog>
   </v-card>
