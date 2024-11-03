@@ -8,7 +8,7 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
-const router = useRouter()
+const visible = ref(false)
 
 const formRef = ref(null)
 
@@ -87,26 +87,34 @@ async function validateForm() {
         <h1>Signup</h1>
         <v-form ref="formRef">
           <v-text-field
-          v-model="email"
-          label="Email"
-          required
-          :rules="[required, validEmail]"
-          maxlength="64"
-          ></v-text-field>
-          <v-text-field
-          v-model="password"
-          label="Password"
-          required
-          type="password"
-          maxlength="32"
-          :rules="[required, minPasswordLength]"
-          ></v-text-field>
-          <v-text-field
             v-model="name"
             label="Name"
             required
             :rules="[required]"
             maxlength="50"
+            color="green-darken-4"
+            variant="outlined"
+          ></v-text-field>
+          <v-text-field
+          v-model="email"
+          label="Email"
+          required
+          :rules="[required, validEmail]"
+          maxlength="64"
+          color="green-darken-4"
+          variant="outlined"
+          ></v-text-field>
+          <v-text-field
+          v-model="password"
+          label="Password"
+          required
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          @click:append-inner="visible = !visible"
+          variant="outlined"
+          maxlength="32"
+          :rules="[required, minPasswordLength]"
+          color="green-darken-4"
           ></v-text-field>
           <v-btn
             color="green"
