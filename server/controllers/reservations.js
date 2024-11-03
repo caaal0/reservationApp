@@ -50,9 +50,9 @@ const getReservation = async (req, res) => {
 
 		const reservation = response.data();
 
-		reservation.startTime = response.data().startTime.toDate();
-		reservation.endTime = response.data().endTime.toDate();
-		reservation.createdAt = response.data().createdAt.toDate();
+		reservation.startTime = new Date(response.data().startTime.toDate()).toLocaleString();
+		reservation.endTime = new Date(response.data().endTime.toDate()).toLocaleString();
+		reservation.createdAt = new Date(response.data().createdAt.toDate()).toLocaleString();
 
 		res.status(200).send({ success: true, data: reservation });
 
@@ -328,6 +328,11 @@ const actionReservation = async (req, res) => {
 			//remove the reservation id from user's currentReservation
 			const userRef = db.collection('customers').doc(reservation.data().userId);
 			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			//if cancelled while approved, remove it from the seat detail as well
+			if(reservation.data().status == 'approved'){
+				const seatRef = db.collection('seats').doc(reservation.data().seatNo);
+				seatRef.update({ approvedReservations: Firestore.FieldValue.arrayRemove(reservationId) });
+			}
 		}
 		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
 
