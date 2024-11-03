@@ -8,8 +8,10 @@ const display = useDisplay();
 const router = useRouter();
 const currentReservation = ref(null);
 const pastReservations = ref([]);
-const errorSnackbar = ref(false);
 const loading = ref(true);
+const showSnackbar = ref(false);
+const snackBarMsg = ref('');
+const snackBarSuccess = ref(true);
 
 async function fetchReservations() {
   const response = await reservationsHelper.getMyReservations();
@@ -19,15 +21,13 @@ async function fetchReservations() {
     // console.log(pastReservations.value)
     loading.value = false;
   }else{
-    showErrorSnackbar();
+    snackBarMsg.value = 'Unable to get data. Please try again later.';
+    snackBarSuccess.value = false;
+    showSnackbar.value = true;
   }
 }
 
 fetchReservations();
-
-function showErrorSnackbar(){
-  errorSnackbar.value = true;
-}
 
 function formatDate(date) {
   const dateObj = new Date(date);
@@ -48,15 +48,34 @@ function formatDate(date) {
 async function cancelReservation(){
 
   if(currentReservation.value.status === 'approved'){
+    console.log('cancel request');
     //cancel request if approved and before the reservation time
+    await reservationsHelper.cancelRequest(currentReservation.value.reservationId).then(response => {
+      if(response.success){
+        snackBarMsg.value = 'Requested for cancel successfully';
+        snackBarSuccess.value = true;
+        showSnackbar.value = true;
+        fetchReservations();
+      }else{
+        console.log(response.error);
+        snackBarMsg.value = 'Unable to cancel reservation. Please try again later.';
+        snackBarSuccess.value = false;
+        showSnackbar.value = true;
+      }
+    });
   }else{
     //cancel request if pending
     await reservationsHelper.actionReservation(currentReservation.value.reservationId, 'cancelled').then(response => {
       if(response.success){
+        snackBarMsg.value = 'Reservation cancelled successfully';
+        snackBarSuccess.value = true;
+        showSnackbar.value = true;
         fetchReservations();
       }else{
         console.log(response.error);
-        showErrorSnackbar();
+        snackBarMsg.value = 'Unable to cancel reservation. Please try again later.';
+        snackBarSuccess.value = false;
+        showSnackbar.value = true;
       }
     });
   }
@@ -132,13 +151,13 @@ async function cancelReservation(){
         </v-row>
       </v-col>
     </v-row>
-    <v-snackbar v-model="errorSnackbar" color="red-darken-1" timeout="3000">
-      Unable to get data currently
+    <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'">
+      {{ snackBarMsg }}
       <template v-slot:actions>
         <v-btn
             color="white"
             variant="text"
-            @click="visibleSnackbar = false"
+            @click="showSnackbar = false"
           >
             Close
           </v-btn>
