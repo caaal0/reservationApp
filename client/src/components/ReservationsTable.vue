@@ -95,6 +95,21 @@ async function actionReservation({reservationId, action}) {
   }
 }
 
+function getStatusClass(status) {
+  switch (status) {
+    case 'approved':
+      return 'status-approved';
+    case 'rejected':
+      return 'status-rejected';
+    case 'pending':
+      return 'status-pending';
+    case 'cancelled':
+      return 'status-cancelled';
+    default:
+      return '';
+  }
+}
+
 </script>
 
 <template>
@@ -142,7 +157,27 @@ async function actionReservation({reservationId, action}) {
           :hover="true"
           @update:options="loadItems"
           @click:row="handleRowClick"
-        ></v-data-table-server>
+          mobile-breakpoint="xs"
+        >
+        <template v-slot:body="{ items }">
+          <tr
+            v-for="(item, index) in items"
+            :key="index"
+            @click="handleRowClick($event, { item })"
+            :class="item.cancelRequest? 'clickable-row cancel-request' : 'clickable-row'"
+            >
+            <td>{{ item.reservationId }}</td>
+            <td>{{ item.startTime }}</td>
+            <td>{{ item.endTime }}</td>
+            <td>{{ item.seatNo }}</td>
+            <td>{{ item.createdAt }}</td>
+            <td>{{ item.name }}</td>
+            <td :class="getStatusClass(item.status)">
+              {{ item.status }}
+            </td>
+          </tr>
+        </template>
+        </v-data-table-server>
 
         <!-- Reservation Details Dialog -->
         <v-dialog v-model="dialog" max-width="600px">
@@ -151,21 +186,25 @@ async function actionReservation({reservationId, action}) {
             <v-card-text>
               <div v-if="selectedReservation">
                 <p><strong>Reservation ID:</strong> {{ selectedReservation.reservationId }}</p>
+                <p><strong>Created At:</strong> {{ selectedReservation.createdAt }}</p>
                 <p><strong>Start Time:</strong> {{ selectedReservation.startTime }}</p>
                 <p><strong>End Time:</strong> {{ selectedReservation.endTime }}</p>
                 <p><strong>Seat Number:</strong> {{ selectedReservation.seatNo }}</p>
                 <p><strong>User:</strong> {{ selectedReservation.name }}</p>
                 <p><strong>Status:</strong> {{ selectedReservation.status }}</p>
                 <p><strong>Action by:</strong> {{ selectedReservation.actionBy }}</p>
+                <p v-if="selectedReservation.cancelRequest"><strong>Requested to Cancel</strong></p>
               </div>
               <div v-else>
                 <p>No reservation selected.</p>
               </div>
             </v-card-text>
             <v-card-actions>
+              <!-- reservation is cancellable as long as it is not yet the endTime -->
+              <v-btn v-if=" new Date() < new Date(selectedReservation.endTime)" color="red-darken-1" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'cancelled'})">Cancel</v-btn>
               <v-spacer></v-spacer>
               <div class="actionButtons" v-if="selectedReservation.status == 'pending'">
-                <v-btn color="green" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'approved'})">Approve</v-btn>
+                <v-btn color="green-darken-1" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'approved'})">Approve</v-btn>
                 <v-btn color="red" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'rejected'})">Reject</v-btn>
               </div>
               <v-btn color="#3a5335" @click="dialog = false">Close</v-btn>
@@ -189,5 +228,33 @@ async function actionReservation({reservationId, action}) {
 h1 {
   margin-bottom: 20px;
   color: var(--green-dark);
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.cancel-request{
+  background-color: #ffcccc;
+}
+
+.status-approved {
+  color: green;
+  font-weight: bold;
+}
+
+.status-rejected {
+  color: red;
+  font-weight: bold;
+}
+
+.status-pending {
+  color: orange;
+  font-weight: bold;
+}
+
+.status-cancelled {
+  color: gray;
+  font-weight: bold;
 }
 </style>
