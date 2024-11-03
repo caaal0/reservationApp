@@ -25,6 +25,7 @@ async function createReservation(seatNumber, startTime, endTime, userId=null, bo
       status: 'pending',
       actionBy: bookForCustomer? bookForCustomer: '',
       createdAt: new Date().toISOString(),
+      cancelRequest: false,
     };
 
     const response = await fetch('http://localhost:8080/reservations', {
@@ -289,6 +290,25 @@ async function actionReservation(reservationId, action, adminStaffId=null){
   }
 }
 
+async function cancelRequest(reservationId){
+  try{
+    const response = await fetch(`http://localhost:8080/reservations/cancel/${reservationId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if(response.ok){
+      const data = await response.json();
+      return data;
+    }
+  }catch (error){
+    console.error('Error:', error);
+    alert('Cancellation request Error.');
+    return {success: false, err: error};
+  }
+}
+
 export default {
   createReservation,
   getReservationsForTable,
@@ -297,4 +317,5 @@ export default {
   getMyReservations,
   getReservation,
   actionReservation,
+  cancelRequest,
 };
