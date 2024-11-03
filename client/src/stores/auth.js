@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,  // To store Firebase authenticated user
     userRole: null, // To store user role
+    currentReservation: null, // To store user's current reservation
   }),
   actions: {
      async setUser(user) {
@@ -16,6 +17,7 @@ export const useAuthStore = defineStore('auth', {
         const userDoc = await getDoc(doc(db, 'customers', this.user.uid));
         if (userDoc.exists()) {
           this.userRole = 'customer';
+          this.currentReservation = userDoc.data().currentReservation;
         }else{
           // console.log('not a customer, checking staff collection with uid: ', this.user.uid);
           const staffDoc = await getDoc(doc(db, 'staffs', this.user.uid));
