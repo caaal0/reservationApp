@@ -188,11 +188,13 @@ async function getMyReservations(){
         const currentReservation = await getReservation(data.data.currentReservation);
         if(currentReservation.success){
           returnObj.currentReservation = currentReservation.data;
+          returnObj.currentReservation.reservationId = data.data.currentReservation;
         }
       }
       //deal with getting the actual details of pastReservations here if there exists a past reservation
       if(data.data.pastReservations.length > 0){
         for (let i = 0; i < data.data.pastReservations.length; i++) {
+          //TODO: create new endpoint to get all past reservations at once
           const pastReservation = await getReservation(data.data.pastReservations[i]);
           if(pastReservation.success){
             // console.log(pastReservation.data);

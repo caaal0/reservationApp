@@ -44,6 +44,24 @@ function formatDate(date) {
 
   return localTime.toLocaleString('en-US', options);
 }
+
+async function cancelReservation(){
+
+  if(currentReservation.value.status === 'approved'){
+    //cancel request if approved and before the reservation time
+  }else{
+    //cancel request if pending
+    await reservationsHelper.actionReservation(currentReservation.value.reservationId, 'cancelled').then(response => {
+      if(response.success){
+        fetchReservations();
+      }else{
+        console.log(response.error);
+        showErrorSnackbar();
+      }
+    });
+  }
+}
+
 </script>
 
 <template>
@@ -85,6 +103,9 @@ function formatDate(date) {
                   </v-card-text>
                   <v-card-actions class="d-flex justify-between" v-if="!currentReservation">
                     <v-btn color="white" text @click="router.push('/')">Reserve a seat</v-btn>
+                  </v-card-actions>
+                  <v-card-actions class="d-flex justify-between cancel-btn" v-else-if="currentReservation && new Date(currentReservation.startTime) > new Date()">
+                    <v-btn color="white" text @click="cancelReservation">Cancel Reservation</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-sheet>
@@ -190,7 +211,7 @@ div span {
 }
 
 .rejected, .cancelled {
-  color: red;
+  color: var(--red-dark);
   font-style: oblique;
   text-transform: uppercase;
 }
@@ -200,5 +221,12 @@ div span {
   color: black;
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
+}
+.cancel-btn .v-btn {
+  background-color: var(--red-medium);
+}
+
+.cancel-btn .v-btn:hover {
+  background-color: var(--red-dark);
 }
 </style>
