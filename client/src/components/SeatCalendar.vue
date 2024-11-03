@@ -111,6 +111,12 @@ function openReservationDialog() {
     snackBarSuccess.value = false
     showSnackbar.value = true
     return
+  }else if(authStore.userRole === 'customer' && authStore.currentReservation != ''){
+    // alert("You already have a reservation")
+    snackBarMsg.value = "You already have a reservation"
+    snackBarSuccess.value = false
+    showSnackbar.value = true
+    return
   }
   reservationDialog.value = true;
 }
