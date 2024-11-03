@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import usersHelper from '@/firebase/usersHelper';
+import reservationsHelper from '@/firebase/reservationsHelper';
 //TODO: enable admin to view reservation details in a dialog
 const headers = [
   {
@@ -24,6 +25,10 @@ const serverItems = ref([]);
 //for dialog
 const dialog = ref(false);
 const selectedUser = ref(null);
+
+//for dialog of currentReservation
+const dialogCurrentReservation = ref(false);
+const reservationDetails = ref(null);
 
 //for search
 const name = ref('');
@@ -91,6 +96,26 @@ async function deleteUser(){
     showSnackbar.value = true;
   }
 }
+
+async function loadCurrentReservation(){
+  try{
+    const response = await reservationsHelper.getReservation(selectedUser.value.currentReservation);
+    if(response.success){
+      reservationDetails.value = response.data;
+      dialogCurrentReservation.value = true;
+    }else{
+      console.error('Error getting reservation');
+      snackBarMsg.value = response.error;
+      snackBarSuccess.value = false;
+      showSnackbar.value = true;
+    }
+  }catch(error){
+    console.error('Error getting reservation');
+      snackBarMsg.value = response.error;
+      snackBarSuccess.value = false;
+      showSnackbar.value = true;
+  }
+}
 </script>
 
 <template>
@@ -148,7 +173,8 @@ async function deleteUser(){
                 <p><strong>Name:</strong> {{ selectedUser.name }}</p>
                 <p><strong>Email:</strong> {{ selectedUser.email }}</p>
                 <p><strong>Contact Number:</strong> {{ selectedUser.contactNo }}</p>
-                <p><strong>Current Reservation ID:</strong> {{ selectedUser.currentReservation }}</p>
+                <!-- <p><strong>Current Reservation ID:</strong> {{ selectedUser.currentReservation }}</p> -->
+                 <v-btn v-if="selectedUser.currentReservation" rounded="false" color="green-lighten-5" @click="loadCurrentReservation">View Current Reservation Details</v-btn>
               </div>
               <div v-else>
                 <p>No reservation selected.</p>
@@ -162,6 +188,27 @@ async function deleteUser(){
                 <v-btn color="red" @click="actionReservation({reservationId: selectedUser.reservationId, action:'rejected'})">Reject</v-btn>
               </div> -->
               <v-btn class="closeBtn" @click="dialog = false">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialogCurrentReservation" max-width="450px">
+          <v-card>
+            <v-card-title>Current Reservation Details</v-card-title>
+            <v-card-text>
+              <div v-if="reservationDetails">
+                <p><strong>Reservation ID:</strong> {{ reservationDetails.reservationId }}</p>
+                <p><strong>Start Time:</strong> {{ reservationDetails.startTime }}</p>
+                <p><strong>End Time:</strong> {{ reservationDetails.endTime }}</p>
+                <p><strong>Seat Number:</strong> {{ reservationDetails.seatNo }}</p>
+                <p><strong>Created At:</strong> {{ reservationDetails.createdAt }}</p>
+                <p><strong>Status:</strong> {{ reservationDetails.status }}</p>
+              </div>
+              <div v-else>
+                <p>No reservation details available.</p>
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn class="closeBtn" @click="dialogCurrentReservation = false">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
