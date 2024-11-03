@@ -91,7 +91,7 @@ async function validateForm() {
             label="Name"
             required
             :rules="[required]"
-            maxlength="50"
+            maxlength="64"
             color="green-darken-4"
             variant="outlined"
           ></v-text-field>
