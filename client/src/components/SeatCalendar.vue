@@ -326,7 +326,7 @@ onMounted(async () => {
       <v-card-title class="text-center">How many hours?</v-card-title>
       <v-card-text class="justify-center">
         <!-- Vuetify Radio Button Group -->
-        <v-radio-group v-model="selectedOption" column>
+        <v-radio-group v-model="selectedOption" column color="#6b8d71">
           <v-radio label="1 Hour" value="1"></v-radio>
           <v-radio label="3 Hours" value="3"></v-radio>
           <v-radio label="5 Hours" value="5"></v-radio>
