@@ -39,9 +39,13 @@ async function updateSeatAvailability() {
             const reservationData = reservationDoc.data();
             const startTime = reservationData.startTime.toDate();
             const endTime = reservationData.endTime.toDate();
-  
+            
             // Check if the current time falls within the reservation's time range
             if (currentTime >= startTime && currentTime <= endTime) {
+              console.log(`Seat ${seatDoc.id} is occupied by reservation ${reservationId}`);
+              if(reservationData.status === 'cancelled'){
+                break;
+              }
               isSeatAvailable = false;
               break; // No need to continue if the seat is occupied
             }
@@ -104,7 +108,7 @@ const updateSeatAvailabilityJob = new CronJob('* * * * *', () => {
   updateSeatAvailability();
 });
 
-// Cron job for clearing current reservations (runs every minute)
+// Cron job for clearing current reservations (runs every 12am)
 const clearCurrentReservationJob = new CronJob('0 0 * * *', () => {
   console.log('Checking reservations to clear currentReservation...');
   clearCustomerCurrentReservation();
