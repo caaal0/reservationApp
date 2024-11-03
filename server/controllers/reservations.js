@@ -64,7 +64,7 @@ const getReservation = async (req, res) => {
 const createReservation = async (req, res) => {
 
 	try{
-		const {userId, name, seatNo, startTime, endTime, status, actionBy, createdAt} = req.body;
+		const {userId, name, seatNo, startTime, endTime, status, actionBy, createdAt, cancelRequest} = req.body;
 		const startTimetoDate = new Date(startTime);
 		const endTimetoDate = new Date(endTime);
 		const createdAttoDate = new Date(createdAt);
@@ -76,7 +76,8 @@ const createReservation = async (req, res) => {
 			endTime: Firestore.Timestamp.fromDate(endTimetoDate),
 			status: status,
 			actionBy: actionBy,
-			createdAt: Firestore.Timestamp.fromDate(createdAttoDate)
+			createdAt: Firestore.Timestamp.fromDate(createdAttoDate),
+			cancelRequest: cancelRequest
 		}
 		if(!newReservation.userId || !newReservation.seatNo || !newReservation.startTime || !newReservation.endTime){
 			throw new Error('Invalid reservation');
@@ -335,6 +336,28 @@ const actionReservation = async (req, res) => {
 	}
 }
 
+const requestCancelReservation = async (req, res) => {
+	
+	const { id } = req.params;
+	try{
+		const reservation = await db.collection('reservations').doc(id).get();
+		
+		if(!reservation.exists){
+			throw new Error('Reservation not found');
+		}
+		
+		if(reservation.data().status != 'approved'){
+			throw new Error('Reservation is not approved');
+		}
+		
+		reservation.ref.update({ cancelRequest: true });
+		res.status(200).send({ success: true, msg: 'Cancellation request sent', data: reservation.data() });
+
+	}catch (err){
+		res.send({ success: false, msg: 'Unable to request cancellation', error: err.message });
+	}
+}
+
 export default {
 	getReservations,
 	getReservation,
@@ -345,5 +368,6 @@ export default {
 	getMyPendingReservations,
 	getApprovedReservations,
 	getMyCurrentReservation,
-	actionReservation
+	actionReservation,
+	requestCancelReservation
 };

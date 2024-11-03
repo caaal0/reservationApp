@@ -20,6 +20,7 @@ router.get('/reservations/pending', reservations.getPendingReservations);
 router.get('/reservations/pending/:id', reservations.getMyPendingReservations);
 router.get('/reservations/current', reservations.getMyCurrentReservation);
 router.put('/reservations/:action', reservations.actionReservation);
+router.put('/reservations/cancel/:id', reservations.requestCancelReservation);
 router.get('/reservations/:id', reservations.getReservation);
 router.post('/reservations', reservations.createReservation);
 router.put('/reservations/:id', reservations.updateReservation);
