@@ -6,6 +6,7 @@ import { loginHelper } from '../firebase/authHelper.js';
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
+const visible = ref(false)
 
 const emit = defineEmits(['close', 'switch-to-signup', 'login-success'])
 
@@ -44,13 +45,19 @@ async function login(){
             label="Email"
             required
             maxlength="64"
+            variant="outlined"
+            color="green-darken-4"
           ></v-text-field>
           <v-text-field
-            v-model="password"
+          v-model="password"
             label="Password"
             required
-            type="password"
+            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+            :type="visible ? 'text' : 'password'"
+            @click:append-inner="visible = !visible"
+            variant="outlined"
             maxlength="32"
+            color="green-darken-4"
           ></v-text-field>
           <v-btn
             @click="login(email.valueOf(), password.valueOf())"
