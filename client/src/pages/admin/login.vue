@@ -11,6 +11,7 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
+const visible = ref(false)
 const unauthorizedSnackbar = ref(false)
 const errorSnackbar = ref(false)
 const errormsg = ref('')
@@ -64,12 +65,19 @@ async function login(){
             v-model="email"
             label="Email"
             required
+            variant="outlined"
+            maxlength="64"
           ></v-text-field>
           <v-text-field
             v-model="password"
             label="Password"
             required
-            type="password"
+            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+            :type="visible ? 'text' : 'password'"
+            @click:append-inner="visible = !visible"
+            variant="outlined"
+            color="green-darken-4"
+            maxlength="32"
           ></v-text-field>
           <v-btn
             @click="login()"
@@ -96,6 +104,7 @@ async function login(){
 h1 {
   font-size: 1.5rem;
   margin-bottom: 20px;
+  color: var(--brown-dark);
 }
 
 .v-btn {
