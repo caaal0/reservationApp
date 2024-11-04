@@ -196,7 +196,7 @@ async function loadCurrentReservation(){
             <v-card-title>Current Reservation Details</v-card-title>
             <v-card-text>
               <div v-if="reservationDetails">
-                <p><strong>Reservation ID:</strong> {{ reservationDetails.reservationId }}</p>
+                <p><strong>Reservation ID:</strong> {{ selectedUser.currentReservation }}</p>
                 <p><strong>Start Time:</strong> {{ reservationDetails.startTime }}</p>
                 <p><strong>End Time:</strong> {{ reservationDetails.endTime }}</p>
                 <p><strong>Seat Number:</strong> {{ reservationDetails.seatNo }}</p>
