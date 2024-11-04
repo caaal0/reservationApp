@@ -7,7 +7,7 @@ import { updateSeatAvailabilityJob, clearCurrentReservationJob } from './schedul
 const app = express();
 // app.use(cors());
 app.use(cors({
-    origin: ['seated.vercel.app'],
+    origin: ['https://seated.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
