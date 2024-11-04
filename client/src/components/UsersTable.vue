@@ -76,10 +76,10 @@ function openDialog(item) {
 }
 
 async function deleteUser(){
-  console.log('Delete user:', selectedUser.value);
+  // console.log('Delete user:', selectedUser.value);
   try{
     const response = await usersHelper.deleteUser(selectedUser.value.userId);
-    console.log(response)
+    // console.log(response)
     if(response.success){
       dialog.value = false;
       loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] });
