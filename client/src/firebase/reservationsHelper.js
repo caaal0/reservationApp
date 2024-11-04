@@ -279,7 +279,7 @@ async function actionReservation(reservationId, action, adminStaffId=null){
     } else {
       const data = await response.json()
       console.error('Reservation action failed');
-      alert('Reservation action failed');
+      // alert('Reservation action failed');
       return data;
     }
 
