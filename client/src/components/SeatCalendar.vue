@@ -158,7 +158,7 @@ function createEvent(startTime, endTime) {
     start: startTime,
     end: endTime,
     allDay: false,
-    class: 'requested',
+    class: customerSelected!=null? 'reserved':'requested',
   }
   events.value.push(newEvent)
 }
@@ -175,6 +175,23 @@ async function finishReservation() {
   // console.log("Time:", selectedTime.value)
   // console.log("Option:", selectedOption.value)
   const {startTime, endTime} = calculateEndTime()
+  //before creating the reservation, check if it overlaps with any other reservation
+  for(let event of events.value){
+    if(event.start <= startTime && event.end >= startTime){
+      // alert("Reservation overlaps with another reservation")
+      snackBarMsg.value = "Reservation overlaps with another reservation"
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+      return
+    }
+    if(event.start <= endTime && event.end >= endTime){
+      // alert("Reservation overlaps with another reservation")
+      snackBarMsg.value = "Reservation overlaps with another reservation"
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+      return
+    }
+  }
   //call firebase function to send data to the database
   let temp_msg = null
   let msg = null
@@ -357,7 +374,6 @@ onMounted(async () => {
         <v-btn text color="#6b8d71" @click="prevStep">Back</v-btn>
         <v-btn text color="#6b8d71" @click="finalizeReservation = true" :disabled="!canFinishReservation">Finish</v-btn>
       </v-card-actions>
-      <!-- make another dialog to confirm the details TODO:  -->
     </v-card>
     <v-dialog v-model="finalizeReservation" persistent max-width="300">
       <v-card>
