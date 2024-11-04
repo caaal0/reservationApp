@@ -317,6 +317,21 @@ const actionReservation = async (req, res) => {
 		if(!validActions.includes(action)){
 			throw new Error('Invalid action');
 		}
+
+		//before approving, check for overlapping reservations first
+		if(action == 'approved'){
+			const approvedReservations = await db.collection('seats').doc(reservation.data().seatNo).get();
+			//iterate through the approved reservations of the seat
+			approvedReservations.data().approvedReservations.forEach(async (approvedReservationId) => {
+				const approvedReservation = await db.collection('reservations').doc(approvedReservationId).get();
+				if(approvedReservation.data().status == 'approved'){
+					if((reservation.data().startTime.toDate() >= approvedReservation.data().startTime.toDate() && reservation.data().startTime.toDate() <= approvedReservation.data().endTime.toDate()) ||
+						(reservation.data().endTime.toDate() >= approvedReservation.data().startTime.toDate() && reservation.data().endTime.toDate() <= approvedReservation.data().endTime.toDate())){
+						throw new Error('Overlapping reservations. Cannot approve.');
+					}
+				}
+			});
+		}
 		
 		reservation.ref.update({ status: action, actionBy: actionByName, actionById: actionById });
 		
