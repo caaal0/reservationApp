@@ -85,7 +85,7 @@ async function actionReservation({reservationId, action}) {
       snackBarMsg.value = `Reservation ${action} successfully.`;
     }else{
       console.log(response.msg);
-      snackBarMsg.value = `Reservation ${action} unsuccessfully.`;
+      snackBarMsg.value = response.error || 'Error occurred. Please try again.';
       snackBarSuccess.value = false;
     }
   } catch (error) {
