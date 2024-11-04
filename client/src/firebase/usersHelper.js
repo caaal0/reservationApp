@@ -1,4 +1,33 @@
+import { auth, db } from "./firebase.js";
+import { doc, updateDoc } from "firebase/firestore";
+import { useAuthStore } from "@/stores/auth";
+import { updateProfile, updatePassword, updatePhoneNumber, PhoneAuthProvider } from "firebase/auth";
 
+async function getCustomer(customerId){
+  try{
+    const response = await fetch(`http://localhost:8080/users/${customerId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Getting user failed');
+      alert('Getting user failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('User retrieval error.');
+    return {success: false, error};
+  }
+}
 
 async function getCustomers(){
   try{
@@ -190,11 +219,59 @@ async function deleteStaff(staffId){
   }
 }
 
+async function updateInfo(oldObj, newObj){
+  try{
+    const authStore = useAuthStore();
+    if(oldObj.email === newObj.email && oldObj.name === newObj.name && oldObj.contact === newObj.contact){
+      throw new Error('No changes detected.');
+    }
+    //make sure someone is signed in
+    if(authStore.user){
+      await updateProfile(authStore.user, {
+        displayName: newObj.name,
+      })
+    }
+    //update contact number in doc only because firebase auth can cost money for larger scales of users
+    //try to update user document for customers here
+    if(authStore.userRole === 'customer'){
+      const customerRef = doc(db, 'customers', authStore.user.uid);
+      await updateDoc(customerRef, {
+        name: newObj.name,
+        email: newObj.email,
+        contactNo: newObj.contact,
+      });
+    //if staff, update staff document
+    }else if(authStore.userRole === 'staff'){
+      const staffRef = doc(db, 'staffs', authStore.user.uid);
+      await updateDoc(staffRef, {
+        name: newObj.name,
+        email: newObj.email,
+        contactNo: newObj.contact,
+      });
+    }else{
+      console.log('Admin info update');
+    }
+
+    return {success: true, msg: 'Info updated successfully.'};
+  }catch(error){
+    console.error(error);
+    // alert('Update info error.');
+    return {success: false, error};
+  }
+}
+
+async function changePassword(oldPassword, newPassword){
+
+}
+
 export default {
+  getCustomer,
   getCustomers,
   getCustomersForTable,
   deleteUser,
   createStaff,
   getStaffs,
   deleteStaff,
+  updateInfo,
+  changePassword,
 }
