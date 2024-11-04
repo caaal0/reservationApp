@@ -14,7 +14,7 @@ async function signInWithGoogle(){
     const result = await signInWithPopup(auth, provider)
 
     const token = await result.user.getIdToken()
-    const response = await fetch('http://localhost:8080/login', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ async function signInWithGoogle(){
     if(response.ok){
       const data = await response.json()
       // console.log(data)
-      const userDoc = await fetch(`http://localhost:8080/users/${data.user.uid}`, {
+      const userDoc = await fetch(`${import.meta.env.VITE_API_URL}/users/${data.user.uid}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
