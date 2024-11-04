@@ -1,7 +1,7 @@
 <script setup>
-  import AppFooter from '@/components/AppFooter.vue';
   import LoginForm from '@/components/LoginForm.vue';
   import SignupForm from '@/components/SignupForm.vue';
+  import EditInformation from '@/components/EditInformation.vue';
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { auth } from '../firebase/firebase.js';
@@ -13,12 +13,17 @@
   authStore.fetchCurrentUser(); //fetch current user right away as it loads to check if user is logged in
   const showLogin = ref(false);
   const showSignup = ref(false);
+  const showEditInformationDialog = ref(false);
   const drawer = ref(false);
   const isLoggedIn = ref(false);
   const items = [
-    { title: 'Edit information', icon: 'mdi-pencil' }, //TODO: make dialog for editing information (name, contact info, change email?)
+    { title: 'Edit information', icon: 'mdi-pencil', click: showEditDialog },
     { title: 'Logout', icon: 'mdi-logout', click: logout },
   ]
+
+  function showEditDialog() {
+    showEditInformationDialog.value = true;
+  }
 
   function switchToSignup() {
     showLogin.value = false;
@@ -142,6 +147,10 @@
 
     <v-dialog v-model="showSignup" max-width="500px" transition="dialog-top-transition" persistent>
       <SignupForm @close="showSignup = false" @switch-to-login="switchToLogin" @signup-success="loggedIn"/>
+    </v-dialog>
+
+    <v-dialog v-model="showEditInformationDialog" max-width="500px" transition="dialog-top-transition">
+      <EditInformation @close="showEditInformationDialog = false"/>
     </v-dialog>
 
     <v-main>
