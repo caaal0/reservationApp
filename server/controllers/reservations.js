@@ -318,19 +318,39 @@ const actionReservation = async (req, res) => {
 			throw new Error('Invalid action');
 		}
 
-		//before approving, check for overlapping reservations first
-		if(action == 'approved'){
+		// Before approving, check for overlapping reservations first
+		if (action == 'approved') {
 			const approvedReservations = await db.collection('seats').doc(reservation.data().seatNo).get();
-			//iterate through the approved reservations of the seat
-			approvedReservations.data().approvedReservations.forEach(async (approvedReservationId) => {
+			// Iterate through the approved reservations of the seat
+			for (const approvedReservationId of approvedReservations.data().approvedReservations) {
 				const approvedReservation = await db.collection('reservations').doc(approvedReservationId).get();
-				if(approvedReservation.data().status == 'approved'){
-					if((reservation.data().startTime.toDate() >= approvedReservation.data().startTime.toDate() && reservation.data().startTime.toDate() <= approvedReservation.data().endTime.toDate()) ||
-						(reservation.data().endTime.toDate() >= approvedReservation.data().startTime.toDate() && reservation.data().endTime.toDate() <= approvedReservation.data().endTime.toDate())){
-						throw new Error('Overlapping reservations. Cannot approve.');
+				if (approvedReservation.data().status == 'approved') {
+					let event = { start: approvedReservation.data().startTime.toDate(), end: approvedReservation.data().endTime.toDate() };
+					let startTime = new Date(reservation.data().startTime.toDate());
+					let endTime = new Date(reservation.data().endTime.toDate());
+					let overlap = false;
+
+					if (event.start <= startTime && event.end >= startTime) {
+						overlap = true;
+					}
+					if (event.start <= endTime && event.end >= endTime) {
+						overlap = true;
+					}
+					if (event.start >= startTime && event.end <= endTime) {
+						overlap = true;
+					}
+					if (event.start <= startTime && event.end >= endTime) {
+						overlap = true;
+					}
+					if (event.start >= startTime && event.end <= endTime) {
+						overlap = true;
+					}
+					if (overlap) {
+						console.log('Overlapping reservations');
+						throw new Error('Overlapping reservations');
 					}
 				}
-			});
+			}
 		}
 		
 		reservation.ref.update({ status: action, actionBy: actionByName, actionById: actionById });
@@ -351,8 +371,8 @@ const actionReservation = async (req, res) => {
 		}
 		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
 
-	}catch (err){
-		res.send({ success: false, msg: `Unable to perform ${action} on reservation ${reservationId}`, error: err.message });
+	}catch (error){
+		res.status(400).send({ success: false, msg: `Unable to perform ${action} on reservation ${reservationId}`, error: error.message });
 	}
 }
 
