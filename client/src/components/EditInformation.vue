@@ -58,6 +58,7 @@ const required = (value) => !!value || 'This field is required.'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 const minPasswordLength = (value) => value.length >= 6 || 'Password must be at least 6 characters long.'
 const passwordMatch = (confirmPassword) => (value) => value === confirmPassword || 'Passwords must match.'
+const noSameAsOldPassword = (oldPassword) => (value) => value !== oldPassword || 'New password cannot be the same as the old password.';
 const validContactNumber = (value) => {
   // If the field is empty, return true (valid)
   if (value === '') return true;
@@ -113,11 +114,21 @@ async function submitEdit() {
 
 async function changePassword(){
   loading.value = true;
-  console.log('Change password clicked');
   if(await validateForm(changePwRef)){
-    // Implement password change logic and API call here
-    console.log('Password change submitted:', editFormData.value);
-    emit('close')
+    const response = await usersHelper.changePassword(editFormData.value.oldPassword, editFormData.value.newPassword)
+    if(response.success){
+      // console.log('Password change successful:', response)
+      snackBarMsg.value = response.msg
+      snackBarSuccess.value = true
+      showSnackbar.value = true
+      emit('close')
+      //
+    }else{
+      // console.log('Password change failed');
+      snackBarMsg.value = response.error
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+    }
   }else{
     // console.log('Password change failed');
     snackBarMsg.value = 'Please fill out the form correctly.'
@@ -128,8 +139,27 @@ async function changePassword(){
 }
 
 function switchCardText(){
-  showEditInformation.value = !showEditInformation.value;
-  showChangePassword.value = !showChangePassword.value;
+  if(checkProvider()){
+    showEditInformation.value = !showEditInformation.value;
+    showChangePassword.value = !showChangePassword.value;
+  }else{
+    snackBarMsg.value = 'You signed in using Google. You cannot change your password.'
+    snackBarSuccess.value = false
+    showSnackbar.value = true
+  }
+}
+
+function checkProvider(){
+  authStore.user.providerData.forEach((providerInfo) => {
+    // console.log('Provider ID:', providerInfo.providerId);
+    // check if they use google as sign in method
+    if (providerInfo.providerId === 'google.com') {
+      // console.log('User signed in using Google');
+      return false;
+    }else{
+      return true;
+    }
+  });
 }
 
 async function validateForm(formRef) {
@@ -210,7 +240,7 @@ async function validateForm(formRef) {
                 v-model="editFormData.newPassword"
                 label="New Password"
                 required
-                :rules="[required, minPasswordLength, passwordMatch(editFormData.confirmPassword)]"
+                :rules="[required, minPasswordLength, passwordMatch(editFormData.confirmPassword), noSameAsOldPassword(editFormData.oldPassword)]"
                 :append-inner-icon="visibleNewPassword ? 'mdi-eye-off' : 'mdi-eye'"
                 :type="visibleNewPassword ? 'text' : 'password'"
                 @click:append-inner="visibleNewPassword = !visibleNewPassword"

@@ -1,7 +1,7 @@
 import { auth, db } from "./firebase.js";
 import { doc, updateDoc } from "firebase/firestore";
 import { useAuthStore } from "@/stores/auth";
-import { updateProfile, updatePassword, updatePhoneNumber, PhoneAuthProvider } from "firebase/auth";
+import { updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 
 async function getCustomer(customerId){
   try{
@@ -261,7 +261,30 @@ async function updateInfo(oldObj, newObj){
 }
 
 async function changePassword(oldPassword, newPassword){
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("No user is currently signed in.");
+    }
 
+    // Re-authenticate the user with the old password
+    const credential = EmailAuthProvider.credential(
+      user.email, // The user's email
+      oldPassword // The old password provided by the user
+    );
+
+    await reauthenticateWithCredential(user, credential);
+    console.log("Re-authentication successful.");
+
+    // Update the password to the new one
+    await updatePassword(user, newPassword);
+    console.log("Password updated successfully.");
+
+    return { success: true, msg: "Password updated successfully." };
+  } catch (error) {
+    console.error("Password update failed:", error);
+    return { success: false, error };
+  }
 }
 
 export default {
