@@ -191,6 +191,27 @@ async function finishReservation() {
       showSnackbar.value = true
       return
     }
+    if(event.start >= startTime && event.end <= endTime){
+      // alert("Reservation overlaps with another reservation")
+      snackBarMsg.value = "Reservation overlaps with another reservation"
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+      return
+    }
+    if(event.start <= startTime && event.end >= endTime){
+      // alert("Reservation overlaps with another reservation")
+      snackBarMsg.value = "Reservation overlaps with another reservation"
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+      return
+    }
+    if(event.start >= startTime && event.end <= endTime){
+      // alert("Reservation overlaps with another reservation")
+      snackBarMsg.value = "Reservation overlaps with another reservation"
+      snackBarSuccess.value = false
+      showSnackbar.value = true
+      return
+    }
   }
   //call firebase function to send data to the database
   let temp_msg = null
