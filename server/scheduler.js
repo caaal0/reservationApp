@@ -108,8 +108,8 @@ const updateSeatAvailabilityJob = new CronJob('* * * * *', () => {
   updateSeatAvailability();
 });
 
-// Cron job for clearing current reservations (runs every 12am)
-const clearCurrentReservationJob = new CronJob('0 0 * * *', () => {
+// Cron job for clearing current reservations (runs every 10 minutes)
+const clearCurrentReservationJob = new CronJob('*/10 * * * *', () => {
   console.log('Checking reservations to clear currentReservation...');
   clearCustomerCurrentReservation();
 });
