@@ -8,6 +8,10 @@ const password = ref('')
 const loading = ref(false)
 const visible = ref(false)
 
+const showSnackbar = ref(false)
+const snackBarSuccess = ref(true)
+const snackBarMsg = ref('')
+
 const emit = defineEmits(['close', 'switch-to-signup', 'login-success'])
 
 async function login(){
@@ -19,7 +23,16 @@ async function login(){
       emit('login-success');
     } else {
       console.error('Login failed');
-      console.log(msg.error);
+      console.log('ERROR: ' + msg.error);
+      if(msg.msg === 'invalid-credential'){
+        snackBarMsg.value = 'Invalid credentials. Please try again.';
+      }else if(msg.msg === 'invalid-email'){
+        snackBarMsg.value = 'Invalid email. Please try again.';
+      }else{
+        snackBarMsg.value = 'Login error. Please reload the page and try again.';
+      }
+      snackBarSuccess.value = false;
+      showSnackbar.value = true;
       // alert('Login failed');
     }
   } catch (error) {
@@ -39,7 +52,7 @@ async function login(){
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <h1>Login</h1>
-        <v-form>
+        <v-form @submit.prevent="login">
           <v-text-field
             v-model="email"
             label="Email"
@@ -60,10 +73,9 @@ async function login(){
             color="green-darken-4"
           ></v-text-field>
           <v-btn
-            @click="login(email.valueOf(), password.valueOf())"
             color="green"
             style="margin-bottom: 20px;"
-            type="button"
+            type="submit"
             :loading="loading"
             width="100%"
             rounded="false"
@@ -86,6 +98,11 @@ async function login(){
             >
               Signup
             </v-btn>
+            <v-snackbar
+              v-model="showSnackbar"
+              :color="snackBarSuccess? 'green':'red'"
+            >{{ snackBarMsg }}
+            </v-snackbar>
           </v-col>
         </v-row>
       </v-col>

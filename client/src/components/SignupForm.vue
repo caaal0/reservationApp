@@ -85,7 +85,7 @@ async function validateForm() {
           <v-icon>mdi-close</v-icon>
         </v-btn>
         <h1>Signup</h1>
-        <v-form ref="formRef">
+        <v-form ref="formRef" @submit.prevent="signup">
           <v-text-field
             v-model="name"
             label="Name"
@@ -119,10 +119,9 @@ async function validateForm() {
           <v-btn
             color="green"
             style="margin-bottom: 20px;"
-            type="button"
+            type="submit"
             width="100%"
             :loading="loading"
-            @click="signup"
             rounded="false"
           >
             Signup

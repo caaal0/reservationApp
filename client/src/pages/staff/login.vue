@@ -61,7 +61,7 @@ async function login(){
     <v-row justify="center" class="fill-height">
       <v-col class="text-center" cols="12" md="6">
         <h1>Staff Login</h1>
-        <v-form>
+        <v-form @submit.prevent="login">
           <v-text-field
             v-model="email"
             label="Email"
@@ -81,9 +81,8 @@ async function login(){
             maxlength="32"
           ></v-text-field>
           <v-btn
-            @click="login()"
             color="green-darken-1"
-            type="button"
+            type="submit"
             width="100%"
             :loading="loading"
           >
