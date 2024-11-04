@@ -7,7 +7,7 @@ import { updateSeatAvailabilityJob, clearCurrentReservationJob } from './schedul
 const app = express();
 // app.use(cors());
 app.use(cors({
-    origin: ['https://seated-qoy8viylm-justin-carl-saguns-projects.vercel.app'],
+    origin: ['seated.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
