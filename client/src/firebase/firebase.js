@@ -33,4 +33,4 @@ setPersistence(auth, browserLocalPersistence)
     console.error("Error setting session persistence:", error);
   });
 
-export { auth, db };
+export { auth, db, app };
