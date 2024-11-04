@@ -64,10 +64,10 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-    const userRole = authStore.userRole;
+    // const userRole = authStore.userRole;
 
     // If the route requires a specific role and the user doesn't match, redirect
-    if (to.meta.role && to.meta.role !== userRole) {
+    if (to.meta.role && to.meta.role !== authStore.userRole) {
       alert('Unauthorized access');
       const unauthorizedPath = to.path.startsWith('/admin') ? '/admin/login' : '/staff/login';
       return next(unauthorizedPath); // Redirect unauthorized users
