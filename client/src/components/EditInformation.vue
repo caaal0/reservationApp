@@ -139,7 +139,8 @@ async function changePassword(){
 }
 
 function switchCardText(){
-  if(checkProvider()){
+
+  if(authStore.user.providerData[0].providerId === 'password'){
     showEditInformation.value = !showEditInformation.value;
     showChangePassword.value = !showChangePassword.value;
   }else{
@@ -149,18 +150,6 @@ function switchCardText(){
   }
 }
 
-function checkProvider(){
-  authStore.user.providerData.forEach((providerInfo) => {
-    // console.log('Provider ID:', providerInfo.providerId);
-    // check if they use google as sign in method
-    if (providerInfo.providerId === 'google.com') {
-      // console.log('User signed in using Google');
-      return false;
-    }else{
-      return true;
-    }
-  });
-}
 
 async function validateForm(formRef) {
   const validity = ref(null);
