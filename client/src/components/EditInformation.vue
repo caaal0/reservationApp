@@ -150,7 +150,6 @@ function switchCardText(){
   }
 }
 
-
 async function validateForm(formRef) {
   const validity = ref(null);
   if (formRef.value) {
