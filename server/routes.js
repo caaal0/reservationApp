@@ -8,33 +8,33 @@ import express from 'express';
 
 const router = express.Router();
 
-router.get('/', index.homePage);
+router.get('/api/', index.homePage);
 //User authentication
-router.post('/signup', auth.signup);
-router.post('/login', auth.login);
+router.post('/api/signup', auth.signup);
+router.post('/api/login', auth.login);
 
 // Reservation management
-router.get('/reservations', reservations.getReservations);
-router.get('/reservations/approved', reservations.getApprovedReservations);
-router.get('/reservations/pending', reservations.getPendingReservations);
-router.get('/reservations/pending/:id', reservations.getMyPendingReservations);
-router.get('/reservations/current', reservations.getMyCurrentReservation);
-router.put('/reservations/:action', reservations.actionReservation);
-router.put('/reservations/cancel/:id', reservations.requestCancelReservation);
-router.get('/reservations/:id', reservations.getReservation);
-router.post('/reservations', reservations.createReservation);
-router.put('/reservations/:id', reservations.updateReservation);
-router.delete('/reservations/:id', reservations.deleteReservation);
+router.get('/api/reservations', reservations.getReservations);
+router.get('/api/reservations/approved', reservations.getApprovedReservations);
+router.get('/api/reservations/pending', reservations.getPendingReservations);
+router.get('/api/reservations/pending/:id', reservations.getMyPendingReservations);
+router.get('/api/reservations/current', reservations.getMyCurrentReservation);
+router.put('/api/reservations/:action', reservations.actionReservation);
+router.put('/api/reservations/cancel/:id', reservations.requestCancelReservation);
+router.get('/api/reservations/:id', reservations.getReservation);
+router.post('/api/reservations', reservations.createReservation);
+router.put('/api/reservations/:id', reservations.updateReservation);
+router.delete('/api/reservations/:id', reservations.deleteReservation);
 //Seat management
-router.get('/seats', seats.getSeats);
-router.get('/seats/:seatNo', seats.getSeat);
+router.get('/api/seats', seats.getSeats);
+router.get('/api/seats/:seatNo', seats.getSeat);
 // User management
-router.get('/users', users.getCustomers);
-router.post('/users/:customerID', users.createCustomerDoc);
-router.get('/users/:customerID', users.getCustomer);
-router.delete('/users/:customerID', users.deleteCustomer);
-router.get('/staffs', users.getStaffs);
-router.post('/staffs', users.createStaff);
-router.delete('/staffs/:staffID', users.deleteStaff);
+router.get('/api/users', users.getCustomers);
+router.post('/api/users/:customerID', users.createCustomerDoc);
+router.get('/api/users/:customerID', users.getCustomer);
+router.delete('/api/users/:customerID', users.deleteCustomer);
+router.get('/api/staffs', users.getStaffs);
+router.post('/api/staffs', users.createStaff);
+router.delete('/api/staffs/:staffID', users.deleteStaff);
 
 export default router;
