@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/api/', index.homePage);
 //User authentication
 router.post('/api/signup', auth.signup);
-router.post('/login', auth.login);
+router.post('/api/login', auth.login);
 
 // Reservation management
 router.get('/api/reservations', reservations.getReservations);
