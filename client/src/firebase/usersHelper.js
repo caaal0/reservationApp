@@ -5,7 +5,7 @@ import { updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthP
 
 async function getCustomer(customerId){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${customerId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${customerId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ async function getCustomer(customerId){
 
 async function getCustomers(){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ async function getCustomersForTable({page, itemsPerPage, sortBy, search}){
   const start = (page - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ async function getCustomersForTable({page, itemsPerPage, sortBy, search}){
 
 async function deleteUser(userId){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ async function createStaff({name, email, contactNo, password}){
       contactNo: contactNo,
       password: password
     }
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/staffs`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/staffs`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ async function createStaff({name, email, contactNo, password}){
 
 async function getStaffs(){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/staffs`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/staffs`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ async function getStaffs(){
 
 async function deleteStaff(staffId){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/staffs/${staffId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/staffs/${staffId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
