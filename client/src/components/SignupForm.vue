@@ -33,7 +33,7 @@ async function signup() {
   }
   loading.value = true;
   try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/signup`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,11 +53,15 @@ async function signup() {
         // directly login after signing up
         const msg = loginHelper(email.value, password.value);
         emit('signup-success');
-        // Handle success (e.g., redirect or show a message)
       } else {
+        const data = await response.json();
         console.error('Signup failed');
-        alert('Signup failed');
-        // Handle failure (e.g., show an error message)
+        // alert('Signup failed');
+        // console.log(data)
+        snackBarMsg.value = data.error || 'Error occurred. Please try again.';
+        snackBarSuccess.value = false;
+        showSnackbar.value = true;
+        loading.value = false;
       }
     } catch (error) {
       console.error('Error:', error);
