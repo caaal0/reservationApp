@@ -153,6 +153,7 @@ function checkProvider(){
   authStore.user.providerData.forEach((providerInfo) => {
     // console.log('Provider ID:', providerInfo.providerId);
     // check if they use google as sign in method
+    console.log(providerInfo.providerId)
     if (providerInfo.providerId === 'google.com') {
       // console.log('User signed in using Google');
       return false;
