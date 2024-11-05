@@ -28,7 +28,7 @@ async function createReservation(seatNumber, startTime, endTime, userId=null, bo
       cancelRequest: false,
     };
 
-    const response = await fetch('${import.meta.env.VITE_API_URL}/api/reservations', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
