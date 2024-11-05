@@ -6,11 +6,19 @@ import { updateSeatAvailabilityJob, clearCurrentReservationJob } from './schedul
 
 const app = express();
 // app.use(cors());
-app.use(cors({
-    origin: ['https://seated.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
-}));
+app.use(function(req, res, next) {
+    // res.header("Access-Control-Allow-Origin", "*");
+    res.set({ "Access-Control-Expose-Headers": "[Content-Type, Authorization]" });
+    const allowedOrigins = ['https://localhost:3000', 'https://seated.vercel.app'];
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+         res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-credentials", true);
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, UPDATE, OPTIONS");
+    next();
+  });
 app.use(express.json());
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -28,7 +28,7 @@ async function createReservation(seatNumber, startTime, endTime, userId=null, bo
       cancelRequest: false,
     };
 
-    const response = await fetch('${import.meta.env.VITE_API_URL}/reservations', {
+    const response = await fetch('${import.meta.env.VITE_API_URL}/api/reservations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ async function getReservationsForTable({page, itemsPerPage, sortBy, search}){
   const start = (page - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/reservations`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ async function getReservationsForTable({page, itemsPerPage, sortBy, search}){
 async function getApprovedReservations(){
   try{
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/reservations/approved`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/approved`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ async function getMyPendingReservations(){
   try{
     // const authStore = useAuthStore();
     const userId = authStore.user?.uid;
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/reservations/pending/${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/pending/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ async function getMyReservations(){
       throw new Error("User not logged in");
     }
     // console.log(userId);
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ async function getMyReservations(){
 
 async function getReservation(reservationId){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/reservations/${reservationId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/${reservationId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -264,7 +264,7 @@ async function actionReservation(reservationId, action, adminStaffId=null){
       actionByName: authStore.user.displayName,
     };
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/reservations/${action}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/${action}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -292,7 +292,7 @@ async function actionReservation(reservationId, action, adminStaffId=null){
 
 async function cancelRequest(reservationId){
   try{
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/reservations/cancel/${reservationId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/cancel/${reservationId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
