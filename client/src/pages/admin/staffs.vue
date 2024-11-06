@@ -128,6 +128,7 @@ async function deleteStaff(staffId){
         <v-card
           hover
           @click="dialogAddStaff = true"
+          height="125"
         >
           <v-card-title>
             <v-icon>mdi-plus</v-icon>
@@ -157,7 +158,7 @@ async function deleteStaff(staffId){
             </v-card-actions>
           </v-card>
         </div>
-        <div v-else>
+        <div class="text-center" style="margin-top: 20px;" v-else>
           <v-progress-circular
             indeterminate
             color="green"
