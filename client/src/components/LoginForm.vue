@@ -105,6 +105,22 @@ async function login(){
             </v-snackbar>
           </v-col>
         </v-row>
+        <v-btn
+        style="margin-right: 10px; margin-top: 20px;"
+        class="mt-5"
+        color="green-darken-2"
+        rounded="false"
+        to="/admin/login"
+        > Login as Admin
+        </v-btn>
+        <v-btn
+        style="margin-left: 10px; margin-top: 20px;"
+        class="mt-5"
+        color="green-darken-2"
+        rounded="false"
+        to="/staff/login"
+        > Login as Staff
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
