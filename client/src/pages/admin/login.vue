@@ -84,10 +84,29 @@ async function login(){
             type="submit"
             width="100%"
             :loading="loading"
+            rounded="false"
           >
             Login
           </v-btn>
         </v-form>
+        <v-btn
+        width="200px"
+        style="margin-right: 10px; margin-top: 20px; margin-left: 10px;"
+        class="mt-5"
+        color="green-darken-2"
+        rounded="false"
+        to="/"
+        > Back to homepage
+        </v-btn>
+        <v-btn
+        width="200px"
+        style="margin-left: 10px; margin-top: 20px; margin-right: 10px;"
+        class="mt-5"
+        color="green-darken-2"
+        rounded="false"
+        to="/staff/login"
+        > Login as Staff
+        </v-btn>
       </v-col>
     </v-row>
     <v-snackbar v-model="unauthorizedSnackbar" color="red">
