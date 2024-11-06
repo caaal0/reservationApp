@@ -120,7 +120,7 @@ async function cancelReservation(){
                   <v-card-text v-else>
                     <h3>You currently have no reservation requested or approved</h3>
                   </v-card-text>
-                  <v-card-actions class="d-flex justify-between" v-if="!currentReservation">
+                  <v-card-actions class="d-flex justify-between" v-if="!currentReservation && !loading">
                     <v-btn color="white" text @click="router.push('/')">Reserve a seat</v-btn>
                   </v-card-actions>
                   <v-card-actions class="d-flex justify-between cancel-btn" v-else-if="currentReservation && new Date(currentReservation.startTime) > new Date()">
