@@ -125,7 +125,7 @@ async function changePassword(){
       //
     }else{
       // console.log('Password change failed');
-      snackBarMsg.value = response.error
+      snackBarMsg.value = 'Password change failed'
       snackBarSuccess.value = false
       showSnackbar.value = true
     }
@@ -176,20 +176,21 @@ async function validateForm(formRef) {
           <v-card-text v-if="showEditInformation">
             <v-form ref="formRef" @submit.prevent="submitEdit">
               <v-text-field
+              v-model="editFormData.email"
+              label="Email"
+              required
+              :rules="[required, validEmail]"
+              maxlength="64"
+              color="green-darken-4"
+              variant="outlined"
+              disabled
+              >
+              </v-text-field>
+              <v-text-field
                 v-model="editFormData.name"
                 label="Name"
                 required
                 :rules="[required]"
-                maxlength="64"
-                color="green-darken-4"
-                variant="outlined"
-              >
-              </v-text-field>
-              <v-text-field
-                v-model="editFormData.email"
-                label="Email"
-                required
-                :rules="[required, validEmail]"
                 maxlength="64"
                 color="green-darken-4"
                 variant="outlined"
