@@ -96,6 +96,7 @@ async function login(){
         color="green-darken-2"
         rounded="false"
         to="/"
+        variant="text"
         > Back to homepage
         </v-btn>
         <v-btn
@@ -105,6 +106,7 @@ async function login(){
         color="green-darken-2"
         rounded="false"
         to="/staff/login"
+        variant="text"
         > Login as Staff
         </v-btn>
       </v-col>
