@@ -13,6 +13,7 @@ const contactNo = ref('')
 const defaultPassword = 'password'
 const role = 'staff'
 const loading = ref(false)
+const loadingStaff = ref(false)
 
 const showSnackbar = ref(false)
 const snackBarSuccess = ref(true)
@@ -83,11 +84,14 @@ function closeDialog() {
 const staffs = ref([])
 
 async function loadStaffs() {
+  loadingStaff.value = true
   try {
     const response = await usersHelper.getStaffs()
     staffs.value = response.data
   } catch (error) {
     console.error('Error:', error)
+  }finally{
+    loadingStaff.value = false
   }
 }
 
@@ -132,25 +136,33 @@ async function deleteStaff(staffId){
         </v-card>
         <hr>
         <!-- staff cards -->
-        <v-card hover v-for="staff in staffs" :key="staff.staffId">
-          <v-card-title>
-            {{ staff.name }}
-          </v-card-title>
-          <v-card-text>
-            <p><strong>Email:</strong> {{ staff.email }}</p>
-            <p><strong>Contact Number:</strong> {{ staff.contactNo }}</p>
-            <p><strong>Staff ID:</strong> {{staff.staffId}}</p>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="red"
-              text
-              @click="deleteStaff(staff.staffId)"
-            >Delete
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <div v-if="!loadingStaff">
+          <v-card hover v-for="staff in staffs" :key="staff.staffId">
+            <v-card-title>
+              {{ staff.name }}
+            </v-card-title>
+            <v-card-text>
+              <p><strong>Email:</strong> {{ staff.email }}</p>
+              <p><strong>Contact Number:</strong> {{ staff.contactNo }}</p>
+              <p><strong>Staff ID:</strong> {{staff.staffId}}</p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="red"
+                text
+                @click="deleteStaff(staff.staffId)"
+              >Delete
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </div>
+        <div v-else>
+          <v-progress-circular
+            indeterminate
+            color="green"
+          ></v-progress-circular>
+        </div>
 
         <!-- add staff dialog -->
         <v-dialog
