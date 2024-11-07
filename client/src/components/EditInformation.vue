@@ -55,6 +55,7 @@ const emit = defineEmits(['close']);
 
 // Validation rules
 const required = (value) => !!value || 'This field is required.'
+const validName = (value) => /^[a-zA-Z-\s]*$/.test(value) || 'Only letters and dashes are allowed'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 const minPasswordLength = (value) => value.length >= 6 || 'Password must be at least 6 characters long.'
 const passwordMatch = (confirmPassword) => (value) => value === confirmPassword || 'Passwords must match.'
@@ -63,7 +64,7 @@ const validContactNumber = (value) => {
   // If the field is empty, return true (valid)
   if (value === '') return true;
   // If the field is not empty, check if it is 11 characters long and only contains numbers
-  return /^[0-9]{11}$/.test(value) || 'Contact number must be 11 digits long and contain only numbers.';
+  return /^(09|\+639)\d{9}$/.test(value) || 'Please input a valid contact number.';
 };
 
 // Watcher to revalidate password fields
@@ -188,18 +189,19 @@ async function validateForm(formRef) {
               </v-text-field>
               <v-text-field
                 v-model="editFormData.name"
-                label="Name"
+                label="Name *"
                 required
-                :rules="[required]"
+                :rules="[required, validName]"
                 maxlength="64"
                 color="green-darken-4"
                 variant="outlined"
+                type="text"
               >
               </v-text-field>
               <v-text-field
                 v-model="editFormData.contact"
                 label="Contact Number"
-                maxlength="11"
+                maxlength=""
                 :rules="[validContactNumber]"
                 color="green-darken-4"
                 variant="outlined"
@@ -208,7 +210,7 @@ async function validateForm(formRef) {
               </v-text-field>
               <v-btn class="change-password-btn text-start" rounded="false" color="green-lighten-1" @click="switchCardText">Change Password</v-btn>
               <v-btn width="80%" color="green-darken-1" type="submit" :loading="loading">Save</v-btn>
-              <v-btn width="80%" color="green-lighten-1" text @click="emit('close')">Cancel</v-btn>
+              <v-btn width="80%" color="red-lighten-1" text @click="emit('close')">Cancel</v-btn>
             </v-form>
           </v-card-text>
           <v-card-text v-else-if="showChangePassword">
