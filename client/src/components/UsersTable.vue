@@ -135,6 +135,7 @@ async function loadCurrentReservation(){
                 hide-details
                 maxlength="50"
                 clearable
+                variant="outlined"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
@@ -146,6 +147,7 @@ async function loadCurrentReservation(){
                 hide-details
                 maxlength="64"
                 clearable
+                variant="outlined"
               ></v-text-field>
             </v-col>
           </v-row>
