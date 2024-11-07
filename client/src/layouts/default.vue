@@ -67,14 +67,17 @@
   <v-app>
 
     <v-app-bar app color="white" elevation="1">
-      <template v-slot:prepend>
+      <template v-if="smAndDown" v-slot:prepend>
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
       <!-- <v-app-bar-title class="appbarTitle" >Seated</v-app-bar-title> -->
       <v-app-bar-title
         class="appbarTitle"
         @click="() => router.push('/')"
-        >Seated</v-app-bar-title>
+        >
+        <img src="../assets/chair-svgrepo-com.svg" alt="chair" style="height: 2rem; margin-right: 0.25rem;"/>
+        Seated
+      </v-app-bar-title>
       <v-spacer />
       <!-- <v-btn text to="/">Home</v-btn> -->
 

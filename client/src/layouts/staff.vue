@@ -36,7 +36,9 @@ function back() {
       <v-app-bar-title
       class="appBar-title"
       @click="() => router.push('/staff')"
-      >Seated
+      >
+      <img src="../assets/chair-svgrepo-com.svg" alt="chair" style="height: 2rem; margin-right: 0.25rem;"/>
+      Seated
       </v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn text v-if="authStore.userRole == 'staff' && currentRoute.path != '/staff/login'" @click="logout">
