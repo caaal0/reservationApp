@@ -44,6 +44,7 @@ function back() {
       <img src="../assets/chair-svgrepo-com.svg" alt="chair" style="height: 2rem; margin-right: 0.25rem;"/>
       Seated
       </v-app-bar-title>
+      <v-spacer />
       <template v-slot:append>
         <div v-if="authStore.userRole == 'staff' && currentRoute.path != '/staff/login' && mdAndUp">
           <v-btn text @click="showEditInformationDialog = true">
