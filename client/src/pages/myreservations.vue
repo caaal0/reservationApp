@@ -39,7 +39,8 @@ function formatDate(date) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: true,
+    timeZone: 'UTC',
   };
 
   return localTime.toLocaleString('en-US', options);
