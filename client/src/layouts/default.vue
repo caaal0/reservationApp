@@ -18,7 +18,8 @@
   const showEditInformationDialog = ref(false);
   const drawer = ref(false);
   const isLoggedIn = ref(false);
-  const items = [
+
+  const loggedInItems = [
     { title: 'Edit information', icon: 'mdi-pencil', click: showEditDialog },
     { title: 'Logout', icon: 'mdi-logout', click: logout },
   ]
@@ -78,34 +79,70 @@
         <img src="../assets/chair-svgrepo-com.svg" alt="chair" style="height: 2rem; margin-right: 0.25rem;"/>
         Seated
       </v-app-bar-title>
-      <v-spacer />
+      <!-- <v-spacer /> -->
       <!-- <v-btn text to="/">Home</v-btn> -->
+      <template v-slot:append>
 
-      <div v-if="authStore.user">
-         <!-- greeting and menu will show up if someone is logged in -->
-         <span id="greeting">Hi {{authStore.user.displayName}}!</span>
-         <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="(item, i) in items"
-              :key="i"
-              @click="item.click"
-            >
+        <div v-if="authStore.user">
+           <!-- greeting and menu will show up if someone is logged in -->
+           <span id="greeting">Hi {{authStore.user.displayName}}!</span>
+           <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
+            </template>
+            <v-list>
+              <v-list-item
+                v-for="(item, i) in loggedInItems"
+                :key="i"
+                @click="item.click"
+              >
+                <template v-slot:prepend>
+                  <v-icon>{{ item.icon }}</v-icon>
+                </template>
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+           </v-menu>
+        </div>
+        <div v-else>
+          <!-- if no one is logged in -->
+          <div v-if="mdAndUp" class="btns-container">
+            <v-btn text @click="showLogin = true">
               <template v-slot:prepend>
-                <v-icon>{{ item.icon }}</v-icon>
+                <v-icon>mdi-login</v-icon>
               </template>
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-         </v-menu>
-      </div>
-      <div v-else>
-        <v-btn text @click="showLogin = true">Login</v-btn>
-        <v-btn text @click="showSignup = true">Signup</v-btn>
-      </div>
+              Login
+            </v-btn>
+            <v-btn text @click="showSignup = true">
+              <template v-slot:prepend>
+                <v-icon>mdi-account-plus</v-icon>
+              </template>
+              Signup
+            </v-btn>
+          </div>
+          <div v-else class="menu-container-loggedout">
+            <v-menu>
+              <template v-slot:activator="{ props }">
+                <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
+              </template>
+              <v-list>
+                <v-list-item @click="showLogin = true">
+                  <template v-slot:prepend>
+                    <v-icon>mdi-login</v-icon>
+                  </template>
+                  <v-list-item-title>Login</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="showSignup = true">
+                  <template v-slot:prepend>
+                    <v-icon>mdi-account-plus</v-icon>
+                  </template>
+                  <v-list-item-title>Signup</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </div>
+      </template>
     </v-app-bar>
 
     <v-navigation-drawer
@@ -198,6 +235,7 @@
   cursor: pointer;
   max-width: fit-content;
   display: inline-block;
+  align-self:auto;
 }
 #greeting {
   font-size: 1.25rem;
