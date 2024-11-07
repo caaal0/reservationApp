@@ -23,6 +23,9 @@ const showSnackbar = ref(false);
 //for admin to book for a customer
 const customerSelected = ref(null)
 
+const events = ref([])
+const finishedLoadingEvents = ref(false)
+
 async function loadCustomers(){
   try{
     const response = await usersHelper.getCustomers()
@@ -94,6 +97,7 @@ async function loadEvents() {
       // alert("Error loading events")
     }
   }
+  finishedLoadingEvents.value = true
 }
 // loadEvents()
 
@@ -272,8 +276,6 @@ const canFinishReservation = computed(() => {
   }
 })
 
-const events = ref([])
-
 const specialHours = {
   // 7: {
   //   from: 0 * 60,
@@ -303,7 +305,7 @@ onMounted(async () => {
     </v-btn>
     <v-card-text class="justify-center">
       <div class="scroll-container">
-        <div class="calendar-wrapper">
+        <div v-if="finishedLoadingEvents" class="calendar-wrapper">
           <vue-cal
             class="vuecal--green-theme"
             active-view="week"
@@ -321,17 +323,23 @@ onMounted(async () => {
             hide-view-selector
             show-time-in-cells
             />
+            <v-btn
+              icon="$plus"
+              variant="text"
+              class="event-create-btn"
+              @click="openReservationDialog"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </div>
+          <div v-else class="d-flex justify-center">
+            <v-progress-circular
+              indeterminate
+              color="green"
+            ></v-progress-circular>
         </div>
       </div>
     </v-card-text>
-    <v-btn
-      icon="$plus"
-      variant="text"
-      class="event-create-btn"
-      @click="openReservationDialog"
-    >
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
     <v-dialog v-model="reservationDialog" max-width="350" @update:model-value="resetSteps">
       <v-card v-if="step === 1" class="text-center">
         <v-card-title>Pick a date</v-card-title>
