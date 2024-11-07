@@ -4,7 +4,12 @@ import usersHelper from '@/firebase/usersHelper';
 
 const required = (value) => !!value || 'This field is required.'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
-const isNumeric = (value) => /^\d+$/.test(value) || 'This field must be a number.'
+const validContactNumber = (value) => {
+  // If the field is empty, return true (valid)
+  if (value === '') return true;
+  // If the field is not empty, check if it is 11 characters long and only contains numbers
+  return /^(09|\+639)\d{9}$/.test(value) || 'Please input a valid contact number.';
+};
 
 const dialogAddStaff = ref(false)
 const name = ref('')
@@ -79,6 +84,7 @@ function closeDialog() {
   if (formRef.value) {
     formRef.value.resetValidation() // Reset validation when dialog is closed
   }
+  clearFields()
 }
 
 const staffs = ref([])
@@ -182,6 +188,7 @@ async function deleteStaff(staffId){
                   required
                   :rules="[required]"
                   maxlength="50"
+                  variant="outlined"
                 ></v-text-field>
                 <v-text-field
                   v-model="email"
@@ -189,14 +196,15 @@ async function deleteStaff(staffId){
                   required
                   :rules="[required, validEmail]"
                   maxlength="64"
+                  variant="outlined"
                 ></v-text-field>
                 <v-text-field
                   v-model="contactNo"
                   label="Contact Number"
                   required
-                  :rules="[required, isNumeric]"
-                  maxlength="11"
+                  :rules="[required, validContactNumber]"
                   inputmode="numeric"
+                  variant="outlined"
                 ></v-text-field>
                 <v-btn
                   color="green"
