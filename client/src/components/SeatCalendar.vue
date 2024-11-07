@@ -259,10 +259,8 @@ const minDate = computed(() => {
 
 const maxDate = computed(() => {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
-    today.setDate(today.getDate() + 1);
-  }else{
+  // today.setHours(0, 0, 0, 0);
+  if(authStore.userRole === 'customer'){
     today.setDate(today.getDate() + 28);
   }
   return today;
