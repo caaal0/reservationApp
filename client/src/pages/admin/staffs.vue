@@ -4,7 +4,12 @@ import usersHelper from '@/firebase/usersHelper';
 
 const required = (value) => !!value || 'This field is required.'
 const validEmail = (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
-const isNumeric = (value) => /^\d+$/.test(value) || 'This field must be a number.'
+const validContactNumber = (value) => {
+  // If the field is empty, return true (valid)
+  if (value === '') return true;
+  // If the field is not empty, check if it is 11 characters long and only contains numbers
+  return /^(09|\+639)\d{9}$/.test(value) || 'Please input a valid contact number.';
+};
 
 const dialogAddStaff = ref(false)
 const name = ref('')
@@ -14,6 +19,7 @@ const defaultPassword = 'password'
 const role = 'staff'
 const loading = ref(false)
 const loadingStaff = ref(false)
+const confirmDeleteDialog = ref(false)
 
 const showSnackbar = ref(false)
 const snackBarSuccess = ref(true)
@@ -79,6 +85,7 @@ function closeDialog() {
   if (formRef.value) {
     formRef.value.resetValidation() // Reset validation when dialog is closed
   }
+  clearFields()
 }
 
 const staffs = ref([])
@@ -98,6 +105,14 @@ async function loadStaffs() {
 onMounted(async () => {
   await loadStaffs()
 })
+
+function confirmDeleteStaff(staffId){
+  confirmDeleteDialog.value = true
+  const confirmDelete = false
+  if(confirmDelete){
+    deleteStaff(staffId)
+  }
+}
 
 async function deleteStaff(staffId){
   try{
@@ -152,7 +167,7 @@ async function deleteStaff(staffId){
               <v-btn
                 color="red"
                 text
-                @click="deleteStaff(staff.staffId)"
+                @click="confirmDelete(staff.staffId)"
               >Delete
               </v-btn>
             </v-card-actions>
@@ -164,6 +179,34 @@ async function deleteStaff(staffId){
             color="green"
           ></v-progress-circular>
         </div>
+        <!-- confirmation dialog to delete staff  -->
+         <v-dialog
+          v-model="confirmDeleteDialog"
+          max-width="400"
+        >
+          <v-card>
+            <v-card-title>
+              Confirm Delete
+            </v-card-title>
+            <v-card-text>
+              Are you sure you want to delete this staff?
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="red"
+                @click="confirmDeleteDialog = false"
+                text
+              >Cancel
+              </v-btn>
+              <v-btn
+                color="green"
+                @click="deleteStaff"
+                text
+              >Delete
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
 
         <!-- add staff dialog -->
         <v-dialog
@@ -182,6 +225,7 @@ async function deleteStaff(staffId){
                   required
                   :rules="[required]"
                   maxlength="50"
+                  variant="outlined"
                 ></v-text-field>
                 <v-text-field
                   v-model="email"
@@ -189,14 +233,15 @@ async function deleteStaff(staffId){
                   required
                   :rules="[required, validEmail]"
                   maxlength="64"
+                  variant="outlined"
                 ></v-text-field>
                 <v-text-field
                   v-model="contactNo"
                   label="Contact Number"
                   required
-                  :rules="[required, isNumeric]"
-                  maxlength="11"
+                  :rules="[required, validContactNumber]"
                   inputmode="numeric"
+                  variant="outlined"
                 ></v-text-field>
                 <v-btn
                   color="green"

@@ -146,6 +146,27 @@ const getStaffs = async (req, res) => {
     }
 }
 
+const getStaff = async (req, res) => {
+    try{
+        console.log('----------test');
+        const staffId = req.params.staffID;
+        
+        if(!staffId) {
+            throw new Error('Invalid staffID');
+        }
+        const response = await STAFFSREF.doc(staffId).get();
+
+        if(!response.exists){
+            throw new Error('Staff not found');
+        }
+        console.log(response.data());
+
+        res.send({ success: true, data: response.data() });
+    }catch (err){
+        res.send({ success: false, msg: 'Unable to get staff', error: err.message });
+    }
+}
+
 export default{
     createCustomerDoc,
     getCustomers,
@@ -154,4 +175,5 @@ export default{
     deleteStaff,
     getCustomer,
     getStaffs,
+    getStaff,
 }

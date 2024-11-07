@@ -39,7 +39,8 @@ function formatDate(date) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: true,
+    timeZone: 'UTC',
   };
 
   return localTime.toLocaleString('en-US', options);
@@ -153,15 +154,6 @@ async function cancelReservation(){
     </v-row>
     <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'">
       {{ snackBarMsg }}
-      <template v-slot:actions>
-        <v-btn
-            color="white"
-            variant="text"
-            @click="showSnackbar = false"
-          >
-            Close
-          </v-btn>
-      </template>
     </v-snackbar>
   </v-container>
 </template>
