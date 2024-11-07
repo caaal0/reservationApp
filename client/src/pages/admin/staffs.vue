@@ -19,6 +19,7 @@ const defaultPassword = 'password'
 const role = 'staff'
 const loading = ref(false)
 const loadingStaff = ref(false)
+const confirmDeleteDialog = ref(false)
 
 const showSnackbar = ref(false)
 const snackBarSuccess = ref(true)
@@ -105,6 +106,14 @@ onMounted(async () => {
   await loadStaffs()
 })
 
+function confirmDeleteStaff(staffId){
+  confirmDeleteDialog.value = true
+  const confirmDelete = false
+  if(confirmDelete){
+    deleteStaff(staffId)
+  }
+}
+
 async function deleteStaff(staffId){
   try{
     const response = await usersHelper.deleteStaff(staffId)
@@ -158,7 +167,7 @@ async function deleteStaff(staffId){
               <v-btn
                 color="red"
                 text
-                @click="deleteStaff(staff.staffId)"
+                @click="confirmDelete(staff.staffId)"
               >Delete
               </v-btn>
             </v-card-actions>
@@ -170,6 +179,34 @@ async function deleteStaff(staffId){
             color="green"
           ></v-progress-circular>
         </div>
+        <!-- confirmation dialog to delete staff  -->
+         <v-dialog
+          v-model="confirmDeleteDialog"
+          max-width="400"
+        >
+          <v-card>
+            <v-card-title>
+              Confirm Delete
+            </v-card-title>
+            <v-card-text>
+              Are you sure you want to delete this staff?
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                color="red"
+                @click="confirmDeleteDialog = false"
+                text
+              >Cancel
+              </v-btn>
+              <v-btn
+                color="green"
+                @click="deleteStaff"
+                text
+              >Delete
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
 
         <!-- add staff dialog -->
         <v-dialog
