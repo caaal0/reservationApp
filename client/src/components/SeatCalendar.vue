@@ -268,6 +268,12 @@ const maxDate = computed(() => {
   return today;
 })
 
+const getCurrentTime = computed(() => {
+  const hours = new Date().getHours();
+  const minutes = new Date().getMinutes();
+  return `${hours}:${minutes}`;
+})
+
 const canFinishReservation = computed(() => {
   if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
     return selectedDay.value && selectedTime.value && selectedOption.value && customerSelected.value
@@ -340,7 +346,7 @@ onMounted(async () => {
         </div>
       </div>
     </v-card-text>
-    <v-dialog v-model="reservationDialog" max-width="350" @update:model-value="resetSteps">
+    <v-dialog v-model="reservationDialog" max-width="370" @update:model-value="resetSteps">
       <v-card v-if="step === 1" class="text-center">
         <v-card-title>Pick a date</v-card-title>
         <v-card-text class="justify-center">
@@ -376,9 +382,11 @@ onMounted(async () => {
           v-model="selectedTime"
           full-width
           height="500"
-          width="350"
+          width="320"
+          :min="getCurrentTime"
           color="#6b8d71"
-          format="24hr"
+          format="ampm"
+          ampm-in-title="true"
         />
       </v-card-text>
       <v-card-actions class="d-flex justify-between">
