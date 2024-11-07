@@ -141,7 +141,7 @@ async function validateForm() {
             <span>Already have an account?</span>
             <v-btn
               variant="text"
-              color="var(--green-light)"
+              color="green-darken-1"
               @click="$emit('switch-to-login')"
             >
               Login
