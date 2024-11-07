@@ -416,15 +416,6 @@ onMounted(async () => {
   </v-card>
   <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'" timeout="3000">
     {{ snackBarMsg }}
-    <template v-slot:actions>
-      <v-btn
-        color="white"
-        variant="text"
-        @click="showSnackbar = false"
-      >
-        Close
-      </v-btn>
-    </template>
   </v-snackbar>
 </template>
 
