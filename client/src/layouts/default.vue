@@ -7,7 +7,9 @@
   import { auth } from '../firebase/firebase.js';
   import { signOut, onAuthStateChanged } from 'firebase/auth';
   import { useAuthStore } from '../stores/auth.js';
+  import { useDisplay } from 'vuetify';
 
+  const { smAndDown, mdAndUp } = useDisplay();
   const router = useRouter();
   const authStore = useAuthStore();
   authStore.fetchCurrentUser(); //fetch current user right away as it loads to check if user is logged in
@@ -105,7 +107,8 @@
 
     <v-navigation-drawer
       floating
-      temporary
+      :permanent="mdAndUp"
+      :temporary="smAndDown"
       v-model="drawer"
     >
       <v-list>
