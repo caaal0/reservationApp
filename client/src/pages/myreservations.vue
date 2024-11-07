@@ -154,15 +154,6 @@ async function cancelReservation(){
     </v-row>
     <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'">
       {{ snackBarMsg }}
-      <template v-slot:actions>
-        <v-btn
-            color="white"
-            variant="text"
-            @click="showSnackbar = false"
-          >
-            Close
-          </v-btn>
-      </template>
     </v-snackbar>
   </v-container>
 </template>
