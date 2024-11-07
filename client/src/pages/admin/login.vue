@@ -89,7 +89,7 @@ async function login(){
             Login
           </v-btn>
         </v-form>
-        <v-btn
+        <!-- <v-btn
         width="200px"
         style="margin-right: 10px; margin-top: 20px; margin-left: 10px;"
         class="mt-5"
@@ -108,7 +108,7 @@ async function login(){
         to="/staff/login"
         variant="text"
         > Login as Staff
-        </v-btn>
+        </v-btn> -->
       </v-col>
     </v-row>
     <v-snackbar v-model="unauthorizedSnackbar" color="red">

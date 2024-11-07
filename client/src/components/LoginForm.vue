@@ -105,7 +105,7 @@ async function login(){
             </v-snackbar>
           </v-col>
         </v-row>
-        <v-btn
+        <!-- <v-btn
         width="200px"
         style="margin-right: 10px; margin-top: 20px; margin-left: 10px;"
         class="mt-5"
@@ -124,7 +124,7 @@ async function login(){
         to="/staff/login"
         variant="text"
         > Login as Staff
-        </v-btn>
+        </v-btn> -->
       </v-col>
     </v-row>
   </v-container>
