@@ -46,10 +46,6 @@
     showLogin.value = false;
     //in the case that the user logs in from the signup form
     if(showSignup.value) showSignup.value = false;
-    // if(smAndDown && authStore.user) {
-    //   loggedInItems.unshift({ title: `Hi ${authStore.user.displayName}!` });
-    // }
-    // console.log(loggedInItems)
     // console.log('user role:', authStore.userRole);
   }
 
