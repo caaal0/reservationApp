@@ -46,6 +46,10 @@
     showLogin.value = false;
     //in the case that the user logs in from the signup form
     if(showSignup.value) showSignup.value = false;
+    // if(smAndDown && authStore.user) {
+    //   loggedInItems.unshift({ title: `Hi ${authStore.user.displayName}!` });
+    // }
+    // console.log(loggedInItems)
     // console.log('user role:', authStore.userRole);
   }
 
@@ -85,12 +89,15 @@
 
         <div v-if="authStore.user">
            <!-- greeting and menu will show up if someone is logged in -->
-           <span id="greeting">Hi {{authStore.user.displayName}}!</span>
+           <span v-if="mdAndUp" class="greeting">Hi {{authStore.user.displayName}}!</span>
            <v-menu>
             <template v-slot:activator="{ props }">
               <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
             </template>
             <v-list>
+              <v-list-item v-if="smAndDown">
+                <v-list-item-title class="greeting">Hi {{authStore.user.displayName}}!</v-list-item-title>
+              </v-list-item>
               <v-list-item
                 v-for="(item, i) in loggedInItems"
                 :key="i"
@@ -237,7 +244,7 @@
   display: inline-block;
   align-self:auto;
 }
-#greeting {
+.greeting {
   font-size: 1.25rem;
   font-weight: bold;
   color: black;
