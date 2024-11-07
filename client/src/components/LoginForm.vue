@@ -93,7 +93,7 @@ async function login(){
             <span>Don't have an account?</span>
             <v-btn
               variant="text"
-              color="var(--green-light)"
+              color="green-darken-1"
               @click="$emit('switch-to-signup')"
             >
               Signup
