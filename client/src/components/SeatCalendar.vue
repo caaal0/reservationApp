@@ -176,36 +176,37 @@ async function finishReservation() {
   // console.log("Option:", selectedOption.value)
   const {startTime, endTime} = calculateEndTime()
   //before creating the reservation, check if it overlaps with any other reservation
+  //times can overlap on the same minute only
   for(let event of events.value){
-    if(event.start <= startTime && event.end >= startTime){
+    if(event.start < startTime && event.end > startTime){
       // alert("Reservation overlaps with another reservation")
       snackBarMsg.value = "Reservation overlaps with another reservation"
       snackBarSuccess.value = false
       showSnackbar.value = true
       return
     }
-    if(event.start <= endTime && event.end >= endTime){
+    if(event.start < endTime && event.end > endTime){
       // alert("Reservation overlaps with another reservation")
       snackBarMsg.value = "Reservation overlaps with another reservation"
       snackBarSuccess.value = false
       showSnackbar.value = true
       return
     }
-    if(event.start >= startTime && event.end <= endTime){
+    if(event.start > startTime && event.end < endTime){
       // alert("Reservation overlaps with another reservation")
       snackBarMsg.value = "Reservation overlaps with another reservation"
       snackBarSuccess.value = false
       showSnackbar.value = true
       return
     }
-    if(event.start <= startTime && event.end >= endTime){
+    if(event.start < startTime && event.end > endTime){
       // alert("Reservation overlaps with another reservation")
       snackBarMsg.value = "Reservation overlaps with another reservation"
       snackBarSuccess.value = false
       showSnackbar.value = true
       return
     }
-    if(event.start >= startTime && event.end <= endTime){
+    if(event.start > startTime && event.end < endTime){
       // alert("Reservation overlaps with another reservation")
       snackBarMsg.value = "Reservation overlaps with another reservation"
       snackBarSuccess.value = false
@@ -249,6 +250,17 @@ async function finishReservation() {
 const minDate = computed(() => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  return today;
+})
+
+const maxDate = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
+    today.setDate(today.getDate() + 1);
+  }else{
+    today.setDate(today.getDate() + 28);
+  }
   return today;
 })
 
@@ -299,11 +311,12 @@ onMounted(async () => {
             :snap-to-time="30"
             :disable-views="['day', 'month', 'year', 'years']"
             :min-date="minDate"
+            :max-date="maxDate"
             :time-step="60"
             :special-hours="specialHours ? specialHours : {}"
             :cell-click-hold="false"
             :drag-to-create-event="false"
-            :editable-events="{ title: false, drag: true, resize: false, delete: true, create: true }"
+            :editable-events="{ title: false, drag: false, resize: false, delete: false, create: true }"
             :events="events"
             hide-view-selector
             show-time-in-cells
@@ -332,6 +345,7 @@ onMounted(async () => {
               :time="false"
               :transitions="false"
               :min-date="minDate"
+              :max-date="maxDate"
               active-view="month"
               :disable-views="['week']"
               @cell-click="onCellClick"
