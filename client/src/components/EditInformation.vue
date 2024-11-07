@@ -6,8 +6,13 @@ import usersHelper from '../firebase/usersHelper';
 const customer = ref(null);
 const authStore = useAuthStore();
 
-async function getCustomerDetails(){
-  const response = await usersHelper.getCustomer(authStore.user.uid)
+async function getUserDetails(){
+  let response = null
+  if(authStore.userRole === 'staff'){
+    response = await usersHelper.getStaff(authStore.user.uid)
+  }else{
+    response = await usersHelper.getCustomer(authStore.user.uid)
+  }
   if(response.success){
     editFormData.value.name = response.data.name
     editFormData.value.email = response.data.email
@@ -31,7 +36,7 @@ const editFormData = ref({
 
 onMounted(async () => {
   // console.log('EditInformation mounted');
-  await getCustomerDetails()
+  await getUserDetails()
 });
 
 const showEditInformation = ref(true);
