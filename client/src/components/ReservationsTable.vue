@@ -61,7 +61,7 @@ watch([name, status], () => {
 });
 
 onMounted(() => {
-  loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [] });
+  loadItems({ page: 1, itemsPerPage: itemsPerPage.value, sortBy: [{key: 'createdAt', order: 'desc'}] });
 });
 
 function handleRowClick(event, item) {
@@ -167,12 +167,12 @@ function getStatusClass(status) {
             :class="item.cancelRequest? 'clickable-row cancel-request' : 'clickable-row'"
             >
             <td>{{ item.reservationId }}</td>
-            <td>{{ item.startTime }}</td>
-            <td>{{ item.endTime }}</td>
-            <td>{{ item.seatNo }}</td>
-            <td>{{ item.createdAt }}</td>
-            <td>{{ item.name }}</td>
-            <td :class="getStatusClass(item.status)">
+            <td align="end">{{ item.startTime }}</td>
+            <td align="end">{{ item.endTime }}</td>
+            <td align="end">{{ item.seatNo }}</td>
+            <td align="end">{{ item.createdAt }}</td>
+            <td align="end">{{ item.name }}</td>
+            <td align="end" :class="getStatusClass(item.status)">
               {{ item.status }}
             </td>
           </tr>
