@@ -34,6 +34,7 @@ router.post('/api/users/:customerID', users.createCustomerDoc);
 router.get('/api/users/:customerID', users.getCustomer);
 router.delete('/api/users/:customerID', users.deleteCustomer);
 router.get('/api/staffs', users.getStaffs);
+router.get('/api/staffs/:staffID', users.getStaff);
 router.post('/api/staffs', users.createStaff);
 router.delete('/api/staffs/:staffID', users.deleteStaff);
 

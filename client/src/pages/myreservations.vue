@@ -39,7 +39,8 @@ function formatDate(date) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: true,
+    timeZone: 'UTC',
   };
 
   return localTime.toLocaleString('en-US', options);
@@ -120,7 +121,7 @@ async function cancelReservation(){
                   <v-card-text v-else>
                     <h3>You currently have no reservation requested or approved</h3>
                   </v-card-text>
-                  <v-card-actions class="d-flex justify-between" v-if="!currentReservation">
+                  <v-card-actions class="d-flex justify-between" v-if="!currentReservation && !loading">
                     <v-btn color="white" text @click="router.push('/')">Reserve a seat</v-btn>
                   </v-card-actions>
                   <v-card-actions class="d-flex justify-between cancel-btn" v-else-if="currentReservation && new Date(currentReservation.startTime) > new Date()">
@@ -153,15 +154,6 @@ async function cancelReservation(){
     </v-row>
     <v-snackbar v-model="showSnackbar" :color="snackBarSuccess? 'green':'red'">
       {{ snackBarMsg }}
-      <template v-slot:actions>
-        <v-btn
-            color="white"
-            variant="text"
-            @click="showSnackbar = false"
-          >
-            Close
-          </v-btn>
-      </template>
     </v-snackbar>
   </v-container>
 </template>

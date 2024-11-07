@@ -2,6 +2,23 @@ import db from '../firebase.js';
 import Firestore from '@google-cloud/firestore';
 const RESERVATIONSREF = db.collection('reservations');
 
+function formatDate(date) {
+	const dateObj = new Date(date);
+	// const localTime = new Date(dateObj.getTime() - (8 * 60 * 60 * 1000)); // subtract 8 hours for UTC-8
+	const localTime = new Date(dateObj.getTime());
+	const options = {
+	  year: 'numeric',
+	  month: 'short',
+	  day: 'numeric',
+	  hour: '2-digit',
+	  minute: '2-digit',
+	  hour12: true,
+	  timeZone: 'UTC',
+	};
+  
+	return localTime.toLocaleString('en-US', options);
+  }
+
 const getReservations = async (req, res) => {
 
 	try{
@@ -11,9 +28,9 @@ const getReservations = async (req, res) => {
 
 		response.forEach(doc => {
 			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
-			let startTime = new Date(doc.data().startTime.toDate()).toLocaleString();
-			let endTime = new Date(doc.data().endTime.toDate()).toLocaleString();
-			let createdAt = new Date(doc.data().createdAt.toDate()).toLocaleString();
+			let startTime = new Date(doc.data().startTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+			let endTime = new Date(doc.data().endTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+			let createdAt = new Date(doc.data().createdAt.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
 
 			reservationsArr.push(doc.data());
 
@@ -50,9 +67,9 @@ const getReservation = async (req, res) => {
 
 		const reservation = response.data();
 
-		reservation.startTime = new Date(response.data().startTime.toDate()).toLocaleString();
-		reservation.endTime = new Date(response.data().endTime.toDate()).toLocaleString();
-		reservation.createdAt = new Date(response.data().createdAt.toDate()).toLocaleString();
+		reservation.startTime = new Date(response.data().startTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+		reservation.endTime = new Date(response.data().endTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+		reservation.createdAt = new Date(response.data().createdAt.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
 
 		res.status(200).send({ success: true, data: reservation });
 

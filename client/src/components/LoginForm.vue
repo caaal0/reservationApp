@@ -93,7 +93,7 @@ async function login(){
             <span>Don't have an account?</span>
             <v-btn
               variant="text"
-              color="var(--green-light)"
+              color="green-darken-1"
               @click="$emit('switch-to-signup')"
             >
               Signup
@@ -105,6 +105,26 @@ async function login(){
             </v-snackbar>
           </v-col>
         </v-row>
+        <v-btn
+        width="200px"
+        style="margin-right: 10px; margin-top: 20px; margin-left: 10px;"
+        class="mt-5"
+        color="green-darken-2"
+        rounded="false"
+        to="/admin/login"
+        variant="text"
+        > Login as Admin
+        </v-btn>
+        <v-btn
+        width="200px"
+        style="margin-left: 10px; margin-top: 20px; margin-right: 10px;"
+        class="mt-5"
+        color="green-darken-2"
+        rounded="false"
+        to="/staff/login"
+        variant="text"
+        > Login as Staff
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>

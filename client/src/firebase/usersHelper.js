@@ -167,6 +167,32 @@ async function createStaff({name, email, contactNo, password}){
   }
 }
 
+async function getStaff(staffId){
+  try{
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/staffs/${staffId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const data = await response.json()
+      console.error('Getting staff failed');
+      alert('Getting staff failed');
+      return data;
+    }
+
+  } catch (error){
+    console.error('Error:', error);
+    alert('Staff retrieval error.');
+    return {success: false, error};
+  }
+}
+
 async function getStaffs(){
   try{
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/staffs`, {
@@ -293,6 +319,7 @@ export default {
   getCustomersForTable,
   deleteUser,
   createStaff,
+  getStaff,
   getStaffs,
   deleteStaff,
   updateInfo,
