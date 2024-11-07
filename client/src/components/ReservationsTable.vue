@@ -129,6 +129,7 @@ function getStatusClass(status) {
                 hide-details
                 maxlength="50"
                 clearable
+                variant="outlined"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
