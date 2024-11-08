@@ -414,6 +414,38 @@ const requestCancelReservation = async (req, res) => {
 	}
 }
 
+const getBatchReservations = async (req, res) => {
+	try {
+	  const { reservationIds } = req.body; // Get array of reservation IDs from request body
+  
+	  if (!Array.isArray(reservationIds) || reservationIds.length === 0) {
+		return res.status(400).send({ success: false, msg: 'No reservation IDs provided' });
+	  }
+  
+	  const reservationsRef = db.collection('reservations');
+	  const reservationPromises = reservationIds.map(async (reservationId) => {
+		const resDoc = await reservationsRef.doc(reservationId).get();
+		if (resDoc.exists) {
+		  const reservationData = resDoc.data();
+		  return {
+			id: reservationId,
+			...reservationData,
+			startTime: formatDate(reservationData.startTime.toDate()),
+			endTime: formatDate(reservationData.endTime.toDate()),
+			createdAt: formatDate(reservationData.createdAt.toDate()),
+		  };
+		}
+		return null; // In case a reservation document does not exist
+	  });
+  
+	  const reservations = (await Promise.all(reservationPromises)).filter(Boolean);
+  
+	  res.status(200).send({ success: true, data: reservations });
+	} catch (err) {
+	  res.status(500).send({ success: false, msg: 'Unable to get batch reservations', error: err.message });
+	}
+}
+
 export default {
 	getReservations,
 	getReservation,
@@ -425,5 +457,6 @@ export default {
 	getApprovedReservations,
 	getMyCurrentReservation,
 	actionReservation,
-	requestCancelReservation
+	requestCancelReservation,
+	getBatchReservations,
 };

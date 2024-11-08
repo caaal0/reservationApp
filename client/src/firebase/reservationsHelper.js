@@ -193,14 +193,22 @@ async function getMyReservations(){
         }
       }
       //deal with getting the actual details of pastReservations here if there exists a past reservation
-      if(data.data.pastReservations.length > 0){
-        for (let i = 0; i < data.data.pastReservations.length; i++) {
-          //TODO: create new endpoint to get all past reservations at once
-          const pastReservation = await getReservation(data.data.pastReservations[i]);
-          if(pastReservation.success){
-            // console.log(pastReservation.data);
-            returnObj.pastReservations.push(pastReservation.data);
+      if (data.data.pastReservations.length > 0) {
+        const batchResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/reservations/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reservationIds: data.data.pastReservations }),
+        });
+
+        if (batchResponse.ok) {
+          const batchData = await batchResponse.json();
+          if (batchData.success) {
+            returnObj.pastReservations = batchData.data;
+          } else {
+            console.error('Failed to retrieve batch reservations');
           }
+        } else {
+          console.error('Batch reservation fetch failed');
         }
       }
       // console.log(returnObj.pastReservations);
