@@ -4,8 +4,8 @@ const RESERVATIONSREF = db.collection('reservations');
 
 function formatDate(date) {
 	const dateObj = new Date(date);
-	// const localTime = new Date(dateObj.getTime() - (8 * 60 * 60 * 1000)); // subtract 8 hours for UTC-8
-	const localTime = new Date(dateObj.getTime());
+	const localTime = new Date(dateObj.getTime() + (8 * 60 * 60 * 1000)); // add 8 hours for UTC+8
+	// const localTime = new Date(dateObj.getTime());
 	const options = {
 	  year: 'numeric',
 	  month: 'short',
@@ -13,7 +13,6 @@ function formatDate(date) {
 	  hour: '2-digit',
 	  minute: '2-digit',
 	  hour12: true,
-	  timeZone: 'UTC',
 	};
   
 	return localTime.toLocaleString('en-US', options);
@@ -28,9 +27,9 @@ const getReservations = async (req, res) => {
 
 		response.forEach(doc => {
 			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
-			let startTime = new Date(doc.data().startTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-			let endTime = new Date(doc.data().endTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-			let createdAt = new Date(doc.data().createdAt.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+			let startTime = formatDate(doc.data().startTime.toDate());
+			let endTime = formatDate(doc.data().endTime.toDate());
+			let createdAt = formatDate(doc.data().createdAt.toDate());
 
 			reservationsArr.push(doc.data());
 
@@ -67,9 +66,9 @@ const getReservation = async (req, res) => {
 
 		const reservation = response.data();
 
-		reservation.startTime = new Date(response.data().startTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-		reservation.endTime = new Date(response.data().endTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-		reservation.createdAt = new Date(response.data().createdAt.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+		reservation.startTime = formatDate(response.data().startTime.toDate());
+		reservation.endTime = formatDate(response.data().endTime.toDate());
+		reservation.createdAt = formatDate(response.data().createdAt.toDate());
 
 		res.status(200).send({ success: true, data: reservation });
 

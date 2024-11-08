@@ -104,9 +104,9 @@ async function cancelReservation(){
                   <v-card-text v-else-if="currentReservation">
                     <v-row>
                       <v-col>
-                        <p class="dates">{{ formatDate(currentReservation.startTime) }}</p>
+                        <p class="dates">{{ currentReservation.startTime }}</p>
                         <p class="dates">to</p>
-                        <p class="dates">{{ formatDate(currentReservation.endTime) }}</p>
+                        <p class="dates">{{ currentReservation.endTime }}</p>
                       </v-col>
                       <v-col>
                         <p class="seat">Seat No.</p>
@@ -143,7 +143,7 @@ async function cancelReservation(){
                       <v-spacer></v-spacer>
                       <span :class="reservation.status"> {{reservation.status}} </span>
                     </p>
-                    <p class="dates">{{formatDate(reservation.startTime)}} - {{formatDate(reservation.endTime)}}</p>
+                    <p class="dates">{{ reservation.startTime}} - {{ reservation.endTime}}</p>
                   </v-card-text>
                 </v-card>
               </v-sheet>
