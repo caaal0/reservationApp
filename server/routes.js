@@ -23,6 +23,7 @@ router.put('/api/reservations/:action', reservations.actionReservation);
 router.put('/api/reservations/cancel/:id', reservations.requestCancelReservation);
 router.get('/api/reservations/:id', reservations.getReservation);
 router.post('/api/reservations', reservations.createReservation);
+router.post('/api/reservations/batch', reservations.getBatchReservations);
 router.put('/api/reservations/:id', reservations.updateReservation);
 router.delete('/api/reservations/:id', reservations.deleteReservation);
 //Seat management
