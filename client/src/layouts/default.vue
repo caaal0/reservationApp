@@ -62,6 +62,10 @@
       alert('Logout error.');
     }
   }
+
+  onMounted(() => {
+    if(mdAndUp.value) drawer.value = true;
+  })
 </script>
 
 <template>
