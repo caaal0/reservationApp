@@ -266,6 +266,26 @@ const maxDate = computed(() => {
   return today;
 })
 
+const today = computed (() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const y = today.getFullYear();
+  const m = today.getMonth()+1;
+  var d = today.getDate();
+  if(d < 10){
+    d = '0'+d;
+  }
+  const day = `${y}-${m}-${d}`
+  // console.log(day)
+  if(selectedDay.value == day){
+    // console.log('true')
+    return true;
+  }else{
+    return false;
+  }
+  // return today;
+})
+
 const getCurrentTime = computed(() => {
   const hours = new Date().getHours();
   const minutes = new Date().getMinutes();
@@ -381,10 +401,10 @@ onMounted(async () => {
           full-width
           height="500"
           width="320"
-          :min="getCurrentTime"
+          :min="today? getCurrentTime : '00:00'"
           color="#6b8d71"
           format="ampm"
-          ampm-in-title="true"
+          :ampm-in-title='true'
         />
       </v-card-text>
       <v-card-actions class="d-flex justify-between">
