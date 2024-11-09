@@ -4,7 +4,6 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
 import usersHelper from '../firebase/usersHelper'
-import analyticsHelper from '@/firebase/analyticsHelper'
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore()
@@ -244,7 +243,7 @@ async function finishReservation() {
     snackBarMsg.value = authStore.userRole ==='customer'? "Request sent! You can view your request in \"My Reservations\"":"Reservation created successfully"
     snackBarSuccess.value = true
 
-    analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
+    // analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
     resetSteps()
   } else {
     //TODO: error snackbar
