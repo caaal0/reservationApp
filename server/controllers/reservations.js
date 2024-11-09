@@ -113,6 +113,7 @@ const createReservation = async (req, res) => {
 		//if not, create a new doc with the currentMonth as the id
 		if(!reservationStatsDoc.exists){
 			const newReservationStats = {
+				id: createdMonth,
 				requests: 1,
 				approved: 0,
 				rejected: 0,
@@ -401,6 +402,7 @@ const actionReservation = async (req, res) => {
 		//if not, create a new doc with the requestedMonth as the id
 		if(!reservationStatsDoc.exists){
 			const newReservationStats = {
+				id: createdMonth,
 				requests: 0,
 				approved: 0,
 				rejected: 0,

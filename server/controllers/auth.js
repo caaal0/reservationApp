@@ -49,6 +49,7 @@ const signup = async (req, res) => {
         const userStatsDoc = await USERSTATSREF.doc(currentMonth).get();
         if (!userStatsDoc.exists) {
             const newUserStats = {
+                id: currentMonth,
                 signUpCount: 1,
                 logInCount: 0,
                 logInDays: [],
@@ -88,6 +89,7 @@ const login = async (req, res) => {
         const userStatsDoc = await USERSTATSREF.doc(currentMonth).get();
         if (!userStatsDoc.exists) {
             const newUserStats = {
+                id: currentMonth,
                 signUpCount: 0,
                 logInCount: 1,
                 logInDays: [currentDate.toISOString().slice(8, 10)],
