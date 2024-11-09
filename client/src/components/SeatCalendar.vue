@@ -168,7 +168,7 @@ function createEvent(startTime, endTime) {
     start: startTime,
     end: endTime,
     allDay: false,
-    class: customerSelected!=null? 'reserved':'requested',
+    class: customerSelected.value!=null? 'reserved':'requested',
   }
   events.value.push(newEvent)
 }
@@ -241,7 +241,7 @@ async function finishReservation() {
     // console.log("Reservation created successfully")
     //create event on the calendar
     createEvent(startTime, endTime)
-    snackBarMsg.value = "Reservation created successfully"
+    snackBarMsg.value = authStore.userRole ==='customer'? "Request sent! You can view your request in \"My Reservations\"":"Reservation created successfully"
     snackBarSuccess.value = true
 
     analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
