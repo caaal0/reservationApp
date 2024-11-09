@@ -183,13 +183,13 @@ async function loadCurrentReservation(){
               </div>
             </v-card-text>
             <v-card-actions>
-              <v-btn class="closeBtn" @click="deleteUser" color="red">Delete</v-btn>
+              <v-btn @click="deleteUser" color="red">Delete</v-btn>
               <v-spacer></v-spacer>
               <!-- <div class="actionButtons" v-if="selectedUser.status == 'pending'">
                 <v-btn color="green" @click="actionReservation({reservationId: selectedUser.reservationId, action:'approved'})">Approve</v-btn>
                 <v-btn color="red" @click="actionReservation({reservationId: selectedUser.reservationId, action:'rejected'})">Reject</v-btn>
               </div> -->
-              <v-btn class="closeBtn" @click="dialog = false">Close</v-btn>
+              <v-btn color="green-darken-4" @click="dialog = false">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -210,7 +210,7 @@ async function loadCurrentReservation(){
               </div>
             </v-card-text>
             <v-card-actions>
-              <v-btn class="closeBtn" @click="dialogCurrentReservation = false">Close</v-btn>
+              <v-btn color="green-darken-4" @click="dialogCurrentReservation = false">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>

@@ -3,6 +3,7 @@ import reservations from './controllers/reservations.js';
 import seats from './controllers/seats.js';
 import users from './controllers/users.js';
 import auth from './controllers/auth.js';
+import stats from './controllers/stats.js';
 
 import express from 'express';
 
@@ -38,5 +39,9 @@ router.get('/api/staffs', users.getStaffs);
 router.get('/api/staffs/:staffID', users.getStaff);
 router.post('/api/staffs', users.createStaff);
 router.delete('/api/staffs/:staffID', users.deleteStaff);
+
+// Stats
+router.get('/api/stats/user', stats.getUserStats);
+router.get('/api/stats/reservation', stats.getReservationStats);
 
 export default router;

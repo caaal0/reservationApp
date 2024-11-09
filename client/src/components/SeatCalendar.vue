@@ -4,7 +4,6 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
 import usersHelper from '../firebase/usersHelper'
-import analyticsHelper from '@/firebase/analyticsHelper'
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore()
@@ -12,6 +11,9 @@ const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
 const customers = ref([])
 const finalizeReservation = ref(false)  // Dialog to confirm reservation details
+
+const showHint = ref(true)
+
 // User choices
 const selectedDay = ref(null)
 const selectedTime = ref(null)
@@ -98,6 +100,9 @@ async function loadEvents() {
     }
   }
   finishedLoadingEvents.value = true
+  setTimeout(() => {
+    showHint.value = false
+  }, 3000)
 }
 // loadEvents()
 
@@ -162,7 +167,7 @@ function createEvent(startTime, endTime) {
     start: startTime,
     end: endTime,
     allDay: false,
-    class: customerSelected!=null? 'reserved':'requested',
+    class: customerSelected.value!=null? 'reserved':'requested',
   }
   events.value.push(newEvent)
 }
@@ -235,10 +240,10 @@ async function finishReservation() {
     // console.log("Reservation created successfully")
     //create event on the calendar
     createEvent(startTime, endTime)
-    snackBarMsg.value = "Reservation created successfully"
+    snackBarMsg.value = authStore.userRole ==='customer'? "Request sent! You can view your request in \"My Reservations\"":"Reservation created successfully"
     snackBarSuccess.value = true
 
-    analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
+    // analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
     resetSteps()
   } else {
     //TODO: error snackbar
@@ -347,6 +352,7 @@ onMounted(async () => {
             hide-view-selector
             show-time-in-cells
             />
+            <!-- button to reserve a timeslot shows a tooltip for 3 seconds -->
             <v-btn
               icon="$plus"
               variant="text"
@@ -354,6 +360,9 @@ onMounted(async () => {
               @click="openReservationDialog"
             >
               <v-icon>mdi-plus</v-icon>
+              <v-tooltip activator="parent" v-model="showHint" location="start">
+                Click here to reserve!
+              </v-tooltip>
             </v-btn>
           </div>
           <div v-else class="d-flex justify-center">
