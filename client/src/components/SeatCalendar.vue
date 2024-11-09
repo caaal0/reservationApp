@@ -12,6 +12,9 @@ const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
 const customers = ref([])
 const finalizeReservation = ref(false)  // Dialog to confirm reservation details
+
+const showHint = ref(true)
+
 // User choices
 const selectedDay = ref(null)
 const selectedTime = ref(null)
@@ -98,6 +101,9 @@ async function loadEvents() {
     }
   }
   finishedLoadingEvents.value = true
+  setTimeout(() => {
+    showHint.value = false
+  }, 3000)
 }
 // loadEvents()
 
@@ -347,6 +353,7 @@ onMounted(async () => {
             hide-view-selector
             show-time-in-cells
             />
+            <!-- button to reserve a timeslot shows a tooltip for 3 seconds -->
             <v-btn
               icon="$plus"
               variant="text"
@@ -354,6 +361,9 @@ onMounted(async () => {
               @click="openReservationDialog"
             >
               <v-icon>mdi-plus</v-icon>
+              <v-tooltip activator="parent" v-model="showHint" location="start">
+                Click here to reserve!
+              </v-tooltip>
             </v-btn>
           </div>
           <div v-else class="d-flex justify-center">
