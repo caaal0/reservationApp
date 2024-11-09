@@ -29,7 +29,7 @@ async function clearReservationAlert(){
   reservationAlert.value = false;
   reservationAlertMsg.value = '';
   const response = await usersHelper.clearReservationAlert(authStore.user.uid);
-  console.log(response);
+  // console.log(response);
   // if(response.success){
   //   console.log('Reservation alert cleared');
   // }else{
