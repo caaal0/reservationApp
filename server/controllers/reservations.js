@@ -1,6 +1,7 @@
 import db from '../firebase.js';
 import Firestore from '@google-cloud/firestore';
 const RESERVATIONSREF = db.collection('reservations');
+const RESERVATIONSTATSREF = db.collection('reservationStats');
 
 function formatDate(date) {
 	const dateObj = new Date(date);
@@ -105,6 +106,30 @@ const createReservation = async (req, res) => {
 		const userRef = db.collection('customers').doc(userId);
 		userRef.update({ currentReservation: response.id });
 		newReservation.reservationId = response.id;
+
+		//if successful, check if reservationStats doc exists for the month the request is created format: YYYY-MM
+		const createdMonth = createdAt.slice(0, 7);
+		const reservationStatsDoc = await RESERVATIONSTATSREF.doc(createdMonth).get();
+		//if not, create a new doc with the currentMonth as the id
+		if(!reservationStatsDoc.exists){
+			const newReservationStats = {
+				requests: 1,
+				approved: 0,
+				rejected: 0,
+				cancelled: 0,
+				requestedSeat: [seatNo],
+				requestedTime: [Firestore.Timestamp.fromDate(startTimetoDate)]
+			}
+			await RESERVATIONSTATSREF.doc(createdMonth).set(newReservationStats);
+		}else{
+			const reservationStatsData = reservationStatsDoc.data();
+			const updatedReservationStats = {
+				requests: reservationStatsData.requests + 1,
+				requestedSeat: Firestore.FieldValue.arrayUnion(seatNo),
+				requestedTime: Firestore.FieldValue.arrayUnion(Firestore.Timestamp.fromDate(startTimetoDate))
+			}
+			await RESERVATIONSTATSREF.doc(createdMonth).update(updatedReservationStats);
+		}
 		res.status(201).send({ success: true, msg: 'Reservation created', data: newReservation });
 
 	}catch (err){
@@ -370,6 +395,21 @@ const actionReservation = async (req, res) => {
 		}
 		
 		reservation.ref.update({ status: action, actionBy: actionByName, actionById: actionById });
+		//check if a reservationStats doc exists for the month of the request, format: YYYY-MM
+		const createdMonth = reservation.data().createdAt.toDate().toISOString().slice(0, 7);
+		const reservationStatsDoc = await RESERVATIONSTATSREF.doc(createdMonth).get();
+		//if not, create a new doc with the requestedMonth as the id
+		if(!reservationStatsDoc.exists){
+			const newReservationStats = {
+				requests: 0,
+				approved: 0,
+				rejected: 0,
+				cancelled: 0,
+				requestedSeat: [],
+				requestedTime: []
+			}
+			await RESERVATIONSTATSREF.doc(createdMonth).set(newReservationStats);
+		}
 		
 		const userRef = db.collection('customers').doc(reservation.data().userId);
 		if(action == 'approved') {
@@ -377,13 +417,25 @@ const actionReservation = async (req, res) => {
 			const seatRef = db.collection('seats').doc(reservation.data().seatNo);
 			seatRef.update({ approvedReservations: Firestore.FieldValue.arrayUnion(reservationId) });
 			userRef.update({ reservationAlertMsg: `Your reservation has been approved`, reservationAlert: true });
+			//update the reservationStats doc for the month of the request
+			reservationStatsDoc.ref.update({ approved: Firestore.FieldValue.increment(1) });
 		}else if(action == 'rejected' || action == 'cancelled'){
 			//remove the reservation id from user's currentReservation
 			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId), reservationAlertMsg: `Your reservation has been ${action}`, reservationAlert: true });
+			
+			//update the reservationStats doc for the month of the request
+			if(action == 'rejected'){
+				reservationStatsDoc.ref.update({ rejected: Firestore.FieldValue.increment(1) });
+			}else if(action == 'cancelled'){
+				reservationStatsDoc.ref.update({ cancelled: Firestore.FieldValue.increment(1) });
+			}
+
 			//if cancelled while approved, remove it from the seat detail as well
 			if(reservation.data().status == 'approved'){
 				const seatRef = db.collection('seats').doc(reservation.data().seatNo);
 				seatRef.update({ approvedReservations: Firestore.FieldValue.arrayRemove(reservationId) });
+				//update the reservationStats doc for the month of the request
+				reservationStatsDoc.ref.update({ approved: Firestore.FieldValue.increment(-1) });
 			}
 		}
 		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
