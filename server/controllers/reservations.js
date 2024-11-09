@@ -371,14 +371,15 @@ const actionReservation = async (req, res) => {
 		
 		reservation.ref.update({ status: action, actionBy: actionByName, actionById: actionById });
 		
+		const userRef = db.collection('customers').doc(reservation.data().userId);
 		if(action == 'approved') {
 			//add the reservation id to the seat
 			const seatRef = db.collection('seats').doc(reservation.data().seatNo);
 			seatRef.update({ approvedReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			userRef.update({ reservationAlertMsg: `Your reservation has been approved`, reservationAlert: true });
 		}else if(action == 'rejected' || action == 'cancelled'){
 			//remove the reservation id from user's currentReservation
-			const userRef = db.collection('customers').doc(reservation.data().userId);
-			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId), reservationAlertMsg: `Your reservation has been ${action}`, reservationAlert: true });
 			//if cancelled while approved, remove it from the seat detail as well
 			if(reservation.data().status == 'approved'){
 				const seatRef = db.collection('seats').doc(reservation.data().seatNo);
