@@ -52,7 +52,7 @@
     // console.log('user role:', authStore.userRole);
     //check if the user has a reservation alert
     if(authStore.userRole === 'customer'){
-      console.log('checking for reservation alert');
+      // console.log('checking for reservation alert');
       const response = await usersHelper.getCustomer(authStore.user.uid);
       if(response.success){
         if(response.data.reservationAlert){
