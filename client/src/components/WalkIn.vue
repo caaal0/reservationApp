@@ -14,7 +14,7 @@ function selectSeat(seat) {
 const floors = [
   { id: 3, name: '3rd Floor (Main)' },
   { id: 4, name: '4th Floor' },
-  { id: 2, name: '2nd Floor' },
+  // { id: 2, name: '2nd Floor' },
 ];
 
 const selectedFloor = ref(3);
@@ -53,12 +53,12 @@ const selectedFloor = ref(3);
           <SeatCalendar :selectedSeat="selectedSeat" @close="seatActive = false"/>
         </v-dialog>
       </v-col>
-      <v-col v-if="selectedFloor == 2" cols="12" md="8" xs="10">
+      <!-- <v-col v-if="selectedFloor == 2" cols="12" md="8" xs="10">
         <lower-floor-seats @seat-selected="selectSeat"/>
         <v-dialog v-model="seatActive" width="1000">
           <SeatCalendar :selectedSeat="selectedSeat" @close="seatActive = false"/>
         </v-dialog>
-      </v-col>
+      </v-col> -->
     </v-row>
   </v-container>
 </template>

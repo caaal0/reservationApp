@@ -202,12 +202,12 @@
           :style="{color: 'var(--black)', margin: '0 1rem 0 1rem', fontSize: '1.25rem'}"
           to="/floor4"
         ></v-list-item>
-        <v-list-item
+        <!-- <v-list-item
           title="2nd Floor"
           prepend-icon="mdi-stairs"
           :style="{color: 'var(--black)', margin: '0 1rem 0 1rem', fontSize: '1.25rem'}"
           to="floor2"
-        ></v-list-item>
+        ></v-list-item> -->
         <v-list-item
           v-if="authStore.user"
           title="My Reservations"
