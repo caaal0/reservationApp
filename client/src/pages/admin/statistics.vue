@@ -80,9 +80,9 @@ const topThreeWeekDays = computed (() => {
       let day = new Date(time).getDay();
       counts[day] = (counts[day] || 0) + 1;
     });
-    console.log(counts);
+    // console.log(counts);
     let sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    console.log(sorted);
+    // console.log(sorted);
     let topThree = sorted.slice(0, 3).map(day => {
       switch (day[0]) {
         case '0':
@@ -115,11 +115,11 @@ const timeOfTheDay = computed (() => {
       let range = hour < 12 && hour > 6 ? 'Morning' : hour > 12 && hour < 17 ? 'Afternoon' : hour > 17 && hour < 19 ? 'Evening' : 'Night';
       counts[range] = (counts[range] || 0) + 1;
     });
-    console.log(counts);
+    // console.log(counts);
     let sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    console.log(sorted);
+    // console.log(sorted);
     let topThree = sorted.slice(0, 3).map(hour => hour[0]);
-    console.log(topThree);
+    // console.log(topThree);
     return topThree.join(', ');
   }
   return 'No data yet';
