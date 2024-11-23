@@ -1,11 +1,12 @@
 import db from '../firebase.js';
 import Firestore from '@google-cloud/firestore';
 const RESERVATIONSREF = db.collection('reservations');
+const RESERVATIONSTATSREF = db.collection('reservationStats');
 
 function formatDate(date) {
 	const dateObj = new Date(date);
-	// const localTime = new Date(dateObj.getTime() - (8 * 60 * 60 * 1000)); // subtract 8 hours for UTC-8
-	const localTime = new Date(dateObj.getTime());
+	const localTime = new Date(dateObj.getTime() + (8 * 60 * 60 * 1000)); // add 8 hours for UTC+8
+	// const localTime = new Date(dateObj.getTime());
 	const options = {
 	  year: 'numeric',
 	  month: 'short',
@@ -13,7 +14,6 @@ function formatDate(date) {
 	  hour: '2-digit',
 	  minute: '2-digit',
 	  hour12: true,
-	  timeZone: 'UTC',
 	};
   
 	return localTime.toLocaleString('en-US', options);
@@ -28,9 +28,9 @@ const getReservations = async (req, res) => {
 
 		response.forEach(doc => {
 			//convert Firestore Timestamp to Date object before storing it in the latest element of the array
-			let startTime = new Date(doc.data().startTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-			let endTime = new Date(doc.data().endTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-			let createdAt = new Date(doc.data().createdAt.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+			let startTime = formatDate(doc.data().startTime.toDate());
+			let endTime = formatDate(doc.data().endTime.toDate());
+			let createdAt = formatDate(doc.data().createdAt.toDate());
 
 			reservationsArr.push(doc.data());
 
@@ -67,9 +67,9 @@ const getReservation = async (req, res) => {
 
 		const reservation = response.data();
 
-		reservation.startTime = new Date(response.data().startTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-		reservation.endTime = new Date(response.data().endTime.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
-		reservation.createdAt = new Date(response.data().createdAt.toDate()).toLocaleString('en-US', { timeZone: 'UTC' });
+		reservation.startTime = formatDate(response.data().startTime.toDate());
+		reservation.endTime = formatDate(response.data().endTime.toDate());
+		reservation.createdAt = formatDate(response.data().createdAt.toDate());
 
 		res.status(200).send({ success: true, data: reservation });
 
@@ -106,6 +106,31 @@ const createReservation = async (req, res) => {
 		const userRef = db.collection('customers').doc(userId);
 		userRef.update({ currentReservation: response.id });
 		newReservation.reservationId = response.id;
+
+		//if successful, check if reservationStats doc exists for the month the request is created format: YYYY-MM
+		const createdMonth = createdAt.slice(0, 7);
+		const reservationStatsDoc = await RESERVATIONSTATSREF.doc(createdMonth).get();
+		//if not, create a new doc with the currentMonth as the id
+		if(!reservationStatsDoc.exists){
+			const newReservationStats = {
+				id: createdMonth,
+				requests: 1,
+				approved: 0,
+				rejected: 0,
+				cancelled: 0,
+				requestedSeat: [seatNo],
+				requestedTime: [Firestore.Timestamp.fromDate(startTimetoDate)]
+			}
+			await RESERVATIONSTATSREF.doc(createdMonth).set(newReservationStats);
+		}else{
+			const reservationStatsData = reservationStatsDoc.data();
+			const updatedReservationStats = {
+				requests: reservationStatsData.requests + 1,
+				requestedSeat: Firestore.FieldValue.arrayUnion(seatNo),
+				requestedTime: Firestore.FieldValue.arrayUnion(Firestore.Timestamp.fromDate(startTimetoDate))
+			}
+			await RESERVATIONSTATSREF.doc(createdMonth).update(updatedReservationStats);
+		}
 		res.status(201).send({ success: true, msg: 'Reservation created', data: newReservation });
 
 	}catch (err){
@@ -371,19 +396,48 @@ const actionReservation = async (req, res) => {
 		}
 		
 		reservation.ref.update({ status: action, actionBy: actionByName, actionById: actionById });
+		//check if a reservationStats doc exists for the month of the request, format: YYYY-MM
+		const createdMonth = reservation.data().createdAt.toDate().toISOString().slice(0, 7);
+		const reservationStatsDoc = await RESERVATIONSTATSREF.doc(createdMonth).get();
+		//if not, create a new doc with the requestedMonth as the id
+		if(!reservationStatsDoc.exists){
+			const newReservationStats = {
+				id: createdMonth,
+				requests: 0,
+				approved: 0,
+				rejected: 0,
+				cancelled: 0,
+				requestedSeat: [],
+				requestedTime: []
+			}
+			await RESERVATIONSTATSREF.doc(createdMonth).set(newReservationStats);
+		}
 		
+		const userRef = db.collection('customers').doc(reservation.data().userId);
 		if(action == 'approved') {
 			//add the reservation id to the seat
 			const seatRef = db.collection('seats').doc(reservation.data().seatNo);
 			seatRef.update({ approvedReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			userRef.update({ reservationAlertMsg: `Your reservation has been approved`, reservationAlert: true });
+			//update the reservationStats doc for the month of the request
+			reservationStatsDoc.ref.update({ approved: Firestore.FieldValue.increment(1) });
 		}else if(action == 'rejected' || action == 'cancelled'){
 			//remove the reservation id from user's currentReservation
-			const userRef = db.collection('customers').doc(reservation.data().userId);
-			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId) });
+			userRef.update({ currentReservation: '', pastReservations: Firestore.FieldValue.arrayUnion(reservationId), reservationAlertMsg: `Your reservation has been ${action}`, reservationAlert: true });
+			
+			//update the reservationStats doc for the month of the request
+			if(action == 'rejected'){
+				reservationStatsDoc.ref.update({ rejected: Firestore.FieldValue.increment(1) });
+			}else if(action == 'cancelled'){
+				reservationStatsDoc.ref.update({ cancelled: Firestore.FieldValue.increment(1) });
+			}
+
 			//if cancelled while approved, remove it from the seat detail as well
 			if(reservation.data().status == 'approved'){
 				const seatRef = db.collection('seats').doc(reservation.data().seatNo);
 				seatRef.update({ approvedReservations: Firestore.FieldValue.arrayRemove(reservationId) });
+				//update the reservationStats doc for the month of the request
+				reservationStatsDoc.ref.update({ approved: Firestore.FieldValue.increment(-1) });
 			}
 		}
 		res.status(200).send({ success: true, msg: `Reservation ${action} successfully` , data: reservation.data() });
@@ -415,6 +469,38 @@ const requestCancelReservation = async (req, res) => {
 	}
 }
 
+const getBatchReservations = async (req, res) => {
+	try {
+	  const { reservationIds } = req.body; // Get array of reservation IDs from request body
+  
+	  if (!Array.isArray(reservationIds) || reservationIds.length === 0) {
+		return res.status(400).send({ success: false, msg: 'No reservation IDs provided' });
+	  }
+  
+	  const reservationsRef = db.collection('reservations');
+	  const reservationPromises = reservationIds.map(async (reservationId) => {
+		const resDoc = await reservationsRef.doc(reservationId).get();
+		if (resDoc.exists) {
+		  const reservationData = resDoc.data();
+		  return {
+			id: reservationId,
+			...reservationData,
+			startTime: formatDate(reservationData.startTime.toDate()),
+			endTime: formatDate(reservationData.endTime.toDate()),
+			createdAt: formatDate(reservationData.createdAt.toDate()),
+		  };
+		}
+		return null; // In case a reservation document does not exist
+	  });
+  
+	  const reservations = (await Promise.all(reservationPromises)).filter(Boolean);
+  
+	  res.status(200).send({ success: true, data: reservations });
+	} catch (err) {
+	  res.status(500).send({ success: false, msg: 'Unable to get batch reservations', error: err.message });
+	}
+}
+
 export default {
 	getReservations,
 	getReservation,
@@ -426,5 +512,6 @@ export default {
 	getApprovedReservations,
 	getMyCurrentReservation,
 	actionReservation,
-	requestCancelReservation
+	requestCancelReservation,
+	getBatchReservations,
 };

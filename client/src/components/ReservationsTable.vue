@@ -201,8 +201,8 @@ function getStatusClass(status) {
               </div>
             </v-card-text>
             <v-card-actions>
-              <!-- reservation is cancellable as long as it is not yet the endTime -->
-              <v-btn v-if=" new Date() < new Date(selectedReservation.endTime)" color="red-darken-1" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'cancelled'})">Cancel</v-btn>
+              <!-- reservation is cancellable as long as it is not yet the endTime OR it is still pending and startTime has passed-->
+              <v-btn v-if=" new Date() < new Date(selectedReservation.endTime) || (selectedReservation.status === 'pending' && new Date() > new Date(selectedReservation.startTime))" color="red-darken-1" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'cancelled'})">Cancel</v-btn>
               <v-spacer></v-spacer>
               <div class="actionButtons" v-if="selectedReservation.status == 'pending'">
                 <v-btn color="green-darken-1" @click="actionReservation({reservationId: selectedReservation.reservationId, action:'approved'})">Approve</v-btn>

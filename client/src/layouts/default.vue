@@ -8,6 +8,7 @@
   import { signOut, onAuthStateChanged } from 'firebase/auth';
   import { useAuthStore } from '../stores/auth.js';
   import { useDisplay } from 'vuetify';
+  import usersHelper from '@/firebase/usersHelper.js';
 
   const { smAndDown, mdAndUp } = useDisplay();
   const router = useRouter();
@@ -16,6 +17,8 @@
   const showLogin = ref(false);
   const showSignup = ref(false);
   const showEditInformationDialog = ref(false);
+  const reservationAlert = ref(false);
+  const reservationAlertMsg = ref('');
   const drawer = ref(false);
   const isLoggedIn = ref(false);
 
@@ -38,7 +41,7 @@
     showLogin.value = true;
   }
 
-  function loggedIn() {
+  async function loggedIn() {
     authStore.fetchCurrentUser();
     // always call authStore.user if you want to get the current user after fetching it
     // console.log(authStore.user.displayName);
@@ -47,6 +50,30 @@
     //in the case that the user logs in from the signup form
     if(showSignup.value) showSignup.value = false;
     // console.log('user role:', authStore.userRole);
+    //check if the user has a reservation alert
+    if(authStore.userRole === 'customer'){
+      // console.log('checking for reservation alert');
+      const response = await usersHelper.getCustomer(authStore.user.uid);
+      if(response.success){
+        if(response.data.reservationAlert){
+          reservationAlertMsg.value = response.data.reservationAlertMsg;
+          reservationAlert.value = true;
+        }
+      }
+    }
+  }
+
+
+  async function clearReservationAlert(){
+    reservationAlert.value = false;
+    reservationAlertMsg.value = '';
+    const response = await usersHelper.clearReservationAlert(authStore.user.uid);
+    console.log(response);
+    // if(response.success){
+    //   console.log('Reservation alert cleared');
+    // }else{
+    //   console.error('Error clearing reservation alert');
+    // }
   }
 
   function logout(){
@@ -62,6 +89,10 @@
       alert('Logout error.');
     }
   }
+
+  onMounted(() => {
+    if(mdAndUp.value) drawer.value = true;
+  })
 </script>
 
 <template>
@@ -171,12 +202,12 @@
           :style="{color: 'var(--black)', margin: '0 1rem 0 1rem', fontSize: '1.25rem'}"
           to="/floor4"
         ></v-list-item>
-        <v-list-item
+        <!-- <v-list-item
           title="2nd Floor"
           prepend-icon="mdi-stairs"
           :style="{color: 'var(--black)', margin: '0 1rem 0 1rem', fontSize: '1.25rem'}"
           to="floor2"
-        ></v-list-item>
+        ></v-list-item> -->
         <v-list-item
           v-if="authStore.user"
           title="My Reservations"
@@ -197,6 +228,18 @@
 
     <v-dialog v-model="showEditInformationDialog" max-width="500px" transition="dialog-top-transition">
       <EditInformation @close="showEditInformationDialog = false"/>
+    </v-dialog>
+
+    <v-dialog v-model="reservationAlert" max-width="500px" transition="dialog-top-transition" persistent>
+      <v-card>
+        <v-card-title>Reservation Alert</v-card-title>
+        <v-card-text>
+          <p>{{reservationAlertMsg}}</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="red" @click="clearReservationAlert">Close</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
 
     <v-main>

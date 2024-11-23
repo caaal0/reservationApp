@@ -313,6 +313,22 @@ async function changePassword(oldPassword, newPassword){
   }
 }
 
+async function clearReservationAlert(userId){
+  const authStore = useAuthStore();
+  if(authStore.userRole !== 'customer'){
+    return {success: false, error: 'Only customers can clear their reservation alert.'};
+  }
+  await updateDoc(doc(db, 'customers', userId), {
+    reservationAlert: false,
+    reservationAlertMsg: '',
+  }).then(() => {
+    return {success: true, msg: 'Reservation alert cleared.'};
+  }).catch((error) => {
+    console.error('Error:', error);
+    return {success: false, error};
+  });
+}
+
 export default {
   getCustomer,
   getCustomers,
@@ -324,4 +340,5 @@ export default {
   deleteStaff,
   updateInfo,
   changePassword,
+  clearReservationAlert,
 }

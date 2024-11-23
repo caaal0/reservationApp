@@ -4,7 +4,6 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import reservationHelper from '../firebase/reservationsHelper'
 import usersHelper from '../firebase/usersHelper'
-import analyticsHelper from '@/firebase/analyticsHelper'
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore()
@@ -12,6 +11,10 @@ const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
 const customers = ref([])
 const finalizeReservation = ref(false)  // Dialog to confirm reservation details
+const disableConfirmBtn = ref(false)
+
+const showHint = ref(true)
+
 // User choices
 const selectedDay = ref(null)
 const selectedTime = ref(null)
@@ -98,6 +101,9 @@ async function loadEvents() {
     }
   }
   finishedLoadingEvents.value = true
+  setTimeout(() => {
+    showHint.value = false
+  }, 3000)
 }
 // loadEvents()
 
@@ -162,7 +168,7 @@ function createEvent(startTime, endTime) {
     start: startTime,
     end: endTime,
     allDay: false,
-    class: customerSelected!=null? 'reserved':'requested',
+    class: customerSelected.value!=null? 'reserved':'requested',
   }
   events.value.push(newEvent)
 }
@@ -221,6 +227,8 @@ async function finishReservation() {
   //call firebase function to send data to the database
   let temp_msg = null
   let msg = null
+  //disable the confirm button here
+  disableConfirmBtn.value = true
   if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
     //also send the customer object, and the admin or staff id with
     const adminStaffId=authStore.user?.uid
@@ -235,10 +243,10 @@ async function finishReservation() {
     // console.log("Reservation created successfully")
     //create event on the calendar
     createEvent(startTime, endTime)
-    snackBarMsg.value = "Reservation created successfully"
+    snackBarMsg.value = authStore.userRole ==='customer'? "Request sent! You can view your request in \"My Reservations\"":"Reservation created successfully"
     snackBarSuccess.value = true
 
-    analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
+    // analyticsHelper.trackReservationEvent(props.selectedSeat, selectedOption.value, startTime, endTime, authStore.userRole != 'customer'? true:false)
     resetSteps()
   } else {
     //TODO: error snackbar
@@ -248,7 +256,8 @@ async function finishReservation() {
     snackBarSuccess.value = false
   }
   showSnackbar.value = true
-  reservationDialog.value = false;
+  reservationDialog.value = false
+  disableConfirmBtn.value = false
 }
 
 const minDate = computed(() => {
@@ -264,6 +273,26 @@ const maxDate = computed(() => {
     today.setDate(today.getDate() + 28);
   }
   return today;
+})
+
+const today = computed (() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const y = today.getFullYear();
+  const m = today.getMonth()+1;
+  var d = today.getDate();
+  if(d < 10){
+    d = '0'+d;
+  }
+  const day = `${y}-${m}-${d}`
+  // console.log(day)
+  if(selectedDay.value == day){
+    // console.log('true')
+    return true;
+  }else{
+    return false;
+  }
+  // return today;
 })
 
 const getCurrentTime = computed(() => {
@@ -327,6 +356,7 @@ onMounted(async () => {
             hide-view-selector
             show-time-in-cells
             />
+            <!-- button to reserve a timeslot shows a tooltip for 3 seconds -->
             <v-btn
               icon="$plus"
               variant="text"
@@ -334,6 +364,9 @@ onMounted(async () => {
               @click="openReservationDialog"
             >
               <v-icon>mdi-plus</v-icon>
+              <v-tooltip activator="parent" v-model="showHint" location="start">
+                Click here to reserve!
+              </v-tooltip>
             </v-btn>
           </div>
           <div v-else class="d-flex justify-center">
@@ -381,10 +414,10 @@ onMounted(async () => {
           full-width
           height="500"
           width="320"
-          :min="getCurrentTime"
+          :min="today? getCurrentTime : '00:00'"
           color="#6b8d71"
           format="ampm"
-          ampm-in-title="true"
+          :ampm-in-title='true'
         />
       </v-card-text>
       <v-card-actions class="d-flex justify-between">
@@ -436,7 +469,7 @@ onMounted(async () => {
         </v-card-text>
         <v-card-actions>
           <v-btn text color="error" @click="finalizeReservation = false">Cancel</v-btn>
-          <v-btn text color="#6b8d71" @click="finishReservation">Confirm</v-btn>
+          <v-btn text color="#6b8d71" @click="finishReservation" :disabled="disableConfirmBtn">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
