@@ -11,6 +11,7 @@ const reservationDialog = ref(false)
 const step = ref(1) // Tracks the current step of the reservation process
 const customers = ref([])
 const finalizeReservation = ref(false)  // Dialog to confirm reservation details
+const disableConfirmBtn = ref(false)
 
 const showHint = ref(true)
 
@@ -226,6 +227,8 @@ async function finishReservation() {
   //call firebase function to send data to the database
   let temp_msg = null
   let msg = null
+  //disable the confirm button here
+  disableConfirmBtn.value = true
   if(authStore.userRole === 'admin' || authStore.userRole === 'staff'){
     //also send the customer object, and the admin or staff id with
     const adminStaffId=authStore.user?.uid
@@ -253,7 +256,8 @@ async function finishReservation() {
     snackBarSuccess.value = false
   }
   showSnackbar.value = true
-  reservationDialog.value = false;
+  reservationDialog.value = false
+  disableConfirmBtn.value = false
 }
 
 const minDate = computed(() => {
@@ -465,7 +469,7 @@ onMounted(async () => {
         </v-card-text>
         <v-card-actions>
           <v-btn text color="error" @click="finalizeReservation = false">Cancel</v-btn>
-          <v-btn text color="#6b8d71" @click="finishReservation">Confirm</v-btn>
+          <v-btn text color="#6b8d71" @click="finishReservation" :disabled="disableConfirmBtn">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

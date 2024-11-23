@@ -10,6 +10,7 @@ import usersHelper from '@/firebase/usersHelper';
 //TODO: use :special-hours in vuecal to indicate closed time or booked hours
 const showSeatCalendar = ref(false);
 const selectedSeat = ref(null);
+const showHint = ref(true);
 
 const authStore = useAuthStore();
 
@@ -39,6 +40,10 @@ async function clearReservationAlert(){
 
 onMounted(async () => {
   // console.log('mounted');
+
+  setTimeout(() => {
+    showHint.value = false;
+  }, 5000);
   if(authStore.userRole === 'customer'){
     // console.log('checking for reservation alert');
     const response = await usersHelper.getCustomer(authStore.user.uid);
@@ -57,7 +62,12 @@ onMounted(async () => {
   <v-container class="fill-height">
     <v-row justify="center">
       <v-col class="text-center" cols="12" >
-        <h1>3rd floor</h1>
+        <h1>
+          3rd floor
+          <v-tooltip activator="parent" v-model="showHint" location="bottom">
+            Select a seat to reserve
+          </v-tooltip>
+        </h1>
         <MainFloorSeats @seat-selected="selectSeat"/>
         <!-- seat calendar dialog -->
         <v-dialog v-model="showSeatCalendar" width="1000">

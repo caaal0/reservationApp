@@ -37,9 +37,9 @@ const seats = [
   { x: 180, y: 145, number: "7" },
   { x: 225, y: 145, number: "8" },
   { x: 270, y: 145, number: "9" },
-  { x: 270, y: 260, number: "10" },
+  { x: 270, y: 260, number: "12" },
   { x: 180, y: 260, number: "11" },
-  { x: 180, y: 195, number: "12" },
+  { x: 180, y: 195, number: "10" },
   { x: 270, y: 195, number: "13" },
 ]
 
